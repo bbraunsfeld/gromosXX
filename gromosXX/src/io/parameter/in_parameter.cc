@@ -5327,6 +5327,7 @@ void io::In_Parameter::read_QMMM(simulation::Parameter & param,
             break;
         case 6:
             param.qmmm.software = simulation::qm_orca;
+            break;
         default:
             break;
     }
