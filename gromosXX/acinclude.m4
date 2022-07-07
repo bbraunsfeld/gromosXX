@@ -464,6 +464,22 @@ EOF
   AM_CONDITIONAL([WITH_CUDA], [test x$with_cuda = xyes])
 ])
 
+dnl check for lib XTB
+AC_DEFUN([AM_PATH_XTB],[
+  AC_ARG_WITH(xtb,
+    [  --with-xtb=DIR         Xtb library directory to use],
+    [
+      [CXXFLAGS="$CXXFLAGS -I${withval}/include -L${withval}/lib"]
+      [LDFLAGS="$LDFLAGS -L${withval}/lib"]
+    ],
+    [
+      AC_MSG_WARN([xtb path was not specified. Trying default paths...])
+    ]
+  )
+  dnl check for lib with these settings and add flags automatically
+  AC_CHECK_LIB([xtb], [xtb_getAPIVersion],, AC_MSG_ERROR([xtb library missing.]))
+])
+
 dnl check for lib CCP4/Clipper
 AC_DEFUN([AM_PATH_CCP4_CLIPPER],[
   dnl allow for ccp4 lib directory specification
