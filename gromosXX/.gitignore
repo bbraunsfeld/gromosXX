@@ -15,7 +15,6 @@ INSTALL
 *~
 
 # test folder:
-/TEST
 src/check/data
 
 # hidden folders:
