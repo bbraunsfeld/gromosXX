@@ -37,7 +37,7 @@ namespace interaction {
     virtual int init(const topology::Topology& topo
                    , const configuration::Configuration& conf
                    , simulation::Simulation& sim
-                   , const interaction::QM_Zone& qm_zone); 
+                   , const interaction::QM_Zone& qm_zone) override; 
 
   private:
 
@@ -51,7 +51,7 @@ namespace interaction {
     int process_input(const topology::Topology& topo
                   , const configuration::Configuration& conf
                   , const simulation::Simulation& sim
-                  , const interaction::QM_Zone& qm_zone);              
+                  , const interaction::QM_Zone& qm_zone) override;              
 
     /**
      * Initialize the QM atoms and QM capping atoms
@@ -91,7 +91,7 @@ namespace interaction {
     /**
      * Call external QM program - XTB
      */
-    int run_calculation();
+    int run_calculation() override;
 
     /**
      * Read output file from the QM program
@@ -103,7 +103,7 @@ namespace interaction {
     int process_output(topology::Topology& topo
                   , configuration::Configuration& conf
                   , simulation::Simulation& sim
-                  , interaction::QM_Zone& qm_zone);
+                  , interaction::QM_Zone& qm_zone) override;
     
     /**
      * Parse charges

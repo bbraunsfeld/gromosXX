@@ -839,6 +839,129 @@ void io::In_QMMM::read(topology::Topology& topo,
     } // GAUCHSM
   }
 
+  /*
+   * Schnetpack NN
+   */
+  else if (sw == simulation::qm_nn) {
+    this->read_units(sim, &sim.param().qmmm.nn);
+    //this->read_elements(topo, &sim.param().qmmm.nn);
+
+    { // NNMODEL
+      buffer = m_block["NNMODEL"];
+
+      if (!buffer.size()) {
+        io::messages.add("NNMODEL block missing",
+                "In_QMMM", io::message::error);
+        return;
+      } else {
+        if (buffer.size() != 4) {
+          io::messages.add("NNMODEL block corrupt. Provide 2 lines.",
+                  "In_QMMM", io::message::error);
+          return;
+        }
+        sim.param().qmmm.nn.model_path = buffer[1];
+        std::string line(buffer[2]);
+        _lineStream.clear();
+        _lineStream.str(line);
+        int model_type;
+        int learning_type;
+        _lineStream >> model_type >> learning_type;
+        if (model_type == 0) sim.param().qmmm.nn.model_type = simulation::nn_model_type_burnn;
+        else if (model_type == 1) sim.param().qmmm.nn.model_type = simulation::nn_model_type_standard;
+        else {
+          std::ostringstream msg;
+          msg << "NNMODEL block corrupt. Unknown option for model type - " << model_type;
+          io::messages.add(msg.str(), "In_QMMM", io::message::error);
+          return;
+        }
+        if (learning_type == 1) sim.param().qmmm.nn.learning_type = simulation::nn_learning_type_all;
+        else if (learning_type == 2) sim.param().qmmm.nn.learning_type = simulation::nn_learning_type_qmonly;
+        if (_lineStream.fail()) {
+          io::messages.add("bad line in NNMODEL block",
+                "In_QMMM", io::message::error);
+          return;
+        }
+      }
+    } // NNMODEL
+    { // NNVALID
+      buffer = m_block["NNVALID"];
+      if (buffer.size()) {
+        if (buffer.size() != 4) {
+          io::messages.add("NNVALID block corrupt. Provide 2 lines.",
+                  "In_QMMM", io::message::error);
+          return;
+        }
+        sim.param().qmmm.nn.val_model_path = buffer[1];
+        std::string line(buffer[2]);
+        _lineStream.clear();
+        _lineStream.str(line);
+        unsigned val_steps;
+        double val_thresh, val_forceconstant;
+        _lineStream >> val_steps >> val_thresh >> val_forceconstant;
+        sim.param().qmmm.nn.val_steps = val_steps;
+        sim.param().qmmm.nn.val_thresh = val_thresh;
+        sim.param().qmmm.nn.val_forceconstant = val_forceconstant;
+        if (_lineStream.fail()) {
+          io::messages.add("bad line in NNVALID block",
+                "In_QMMM", io::message::error);
+          return;
+        }
+      }
+    } // NNVALID
+    { // NNCHARGE
+      buffer = m_block["NNCHARGE"];
+      if (sim.param().qmmm.qm_ch == simulation::qm_ch_dynamic) {
+        if (buffer.size()) {
+          if (buffer.size() != 4) {
+            io::messages.add("NNCHARGE block corrupt. Provide 2 lines.",
+                    "In_QMMM", io::message::error);
+            return;
+          }
+          sim.param().qmmm.nn.charge_model_path = buffer[1];
+          std::string line(buffer[2]);
+          _lineStream.clear();
+          _lineStream.str(line);
+          unsigned charge_steps;
+          _lineStream >> charge_steps;
+          sim.param().qmmm.nn.charge_steps = charge_steps;
+          if (_lineStream.fail()) {
+            io::messages.add("bad line in NNCHARGE block",
+                  "In_QMMM", io::message::error);
+            return;
+          }
+        } else {
+          io::messages.add("Dynamic QM charges requested but NNCHARGE is not specified.",
+              "In_QMMM", io::message::error);
+        }
+      }
+    } // NNCHARGE
+    { // NNDEVICE
+      buffer = m_block["NNDEVICE"];
+      const std::set<std::string> allowed = {"auto", "cpu", "cuda"};
+
+      if (!buffer.size()) {
+        io::messages.add("NNDEVICE not specified.",
+            "In_QMMM", io::message::notice);
+      } else {
+        if (buffer.size() != 3) {
+          io::messages.add("NNDEVICE block corrupt. Provide 1 line.",
+                  "In_QMMM", io::message::error);
+          return;
+        }
+        const std::string device = buffer[1];
+        if (device == "auto") sim.param().qmmm.nn.device = simulation::nn_device_auto;
+        else if (device == "cuda") sim.param().qmmm.nn.device = simulation::nn_device_cuda;
+        else if (device == "cpu") sim.param().qmmm.nn.device = simulation::nn_device_cpu;
+        else {
+          std::ostringstream msg;
+          msg << "NNDEVICE block corrupt. Unknown option - " << device;
+          io::messages.add(msg.str(), "In_QMMM", io::message::error);
+          return;
+        }
+      }
+    } // NNDEVICE
+  }
+
   /**
    * Orca
    */
@@ -936,27 +1059,55 @@ void io::In_QMMM::read(topology::Topology& topo,
   }
 
   // Cap length definition
-  if(topo.qmmm_link().size() > 0 ) {
-    _lineStream.clear();
-    buffer = m_block["CAPLEN"];
-    if (!buffer.size()) {
-      io::messages.add("no CAPLEN block in QM/MM specification file",
-              "In_QMMM", io::message::error);
-    }
-    else {
-      double caplen;
-      std::string line(*(buffer.begin() + 1));
+  { // CAPLEN
+    if(topo.qmmm_link().size() > 0 ) {
       _lineStream.clear();
-      _lineStream.str(line);
-      _lineStream >> caplen;
-      if (_lineStream.fail()) {
-        io::messages.add("bad line in CAPLEN block.",
-                          "In_QMMM", io::message::error);
+      buffer = m_block["CAPLEN"];
+      if (!buffer.size()) {
+        io::messages.add("no CAPLEN block in QM/MM specification file",
+                "In_QMMM", io::message::error);
+      }
+      else {
+        double caplen = 0.0;
+        std::string line(*(buffer.begin() + 1));
+        _lineStream.clear();
+        _lineStream.str(line);
+        _lineStream >> caplen;
+        if (_lineStream.fail()) {
+          io::messages.add("bad line in CAPLEN block.",
+                            "In_QMMM", io::message::error);
+          return;
+          sim.param().qmmm.cap_length = caplen;
+        }
+      }
+    }
+  } // CAPLEN
+
+  // check if NN charge model is defined
+  if (sw == simulation::qm_nn
+        && sim.param().qmmm.qm_ch == simulation::qm_ch_dynamic
+        && sim.param().qmmm.nn.charge_model_path.empty()) {
+    io::messages.add("dynamic QM charge requested but no NN charge model specified",
+                "In_QMMM", io::message::error);
+  }
+
+  // allow learning_type == nn_learning_type_qmonly only for single-atom QM region
+  if (sw == simulation::qm_nn
+        && sim.param().qmmm.nn.learning_type == simulation::nn_learning_type_qmonly) {
+    size_t qm_size = 0;
+    for (unsigned i = 0; i < topo.num_atoms(); ++i) {
+      if (topo.is_qm(i)) ++qm_size;
+      if (qm_size > 1) {
+        io::messages.add("multi-atom QM region with learning type other than 1 is not implemented",
+                "In_QMMM", io::message::error);
         return;
-        sim.param().qmmm.cap_length = caplen;
       }
     }
   }
+
+  // if dynamic charges for buffer will be used
+  sim.param().qmmm.dynamic_buffer_charges =
+      sim.param().qmmm.use_qm_buffer && (sim.param().qmmm.qm_ch == simulation::qm_ch_dynamic);
 }
 
 void io::In_QMMM::read_elements(const topology::Topology& topo
@@ -974,7 +1125,7 @@ void io::In_QMMM::read_elements(const topology::Topology& topo
   // Strip away the last newline character
   bstr.pop_back();
   _lineStream.str(bstr);
-  unsigned Z;
+  unsigned Z = 0;
   std::string element;
   while(!_lineStream.eof()) {
     _lineStream >> Z >> element;
@@ -1117,45 +1268,6 @@ void io::In_QMMM::read_iac_elements(topology::Topology& topo
 void io::In_QMMM::read_units(const simulation::Simulation& sim
                   , simulation::Parameter::qmmm_struct::qm_param_struct* qm_param)
   {
-  // std::map<simulation::qm_software_enum, std::array<double, 4> >
-  // unit_factor_defaults = {
-  //   {simulation::qm_mndo,
-  //                   { math::angstrom /* A */
-  //                   , math::kcal /* kcal */
-  //                   , math::kcal / math::angstrom /* kcal/A*/
-  //                   , math::echarge /* e */}},
-  //   {simulation::qm_turbomole,
-  //                   { math::bohr /* a.u. */
-  //                   , math::hartree * math::avogadro /* a.u. */
-  //                   , math::hartree * math::avogadro / math::bohr /* a.u. */
-  //                   , math::echarge /* e */}},
-  //   {simulation::qm_dftb,
-  //                   { math::angstrom /* A */
-  //                   , math::hartree * math::avogadro /* a.u. */
-  //                   , math::hartree * math::avogadro / math::bohr /* a.u. */
-  //                   , math::echarge /* e */}},
-  //   {simulation::qm_mopac,
-  //                   { math::angstrom /* A */
-  //                   , math::kcal /* kcal */
-  //                   , math::kcal / math::angstrom /* kcal/A */
-  //                   , math::echarge /* e */}},
-  //   {simulation::qm_gaussian,
-  //                   { math::angstrom /* A */
-  //                   , math::hartree * math::avogadro /* a.u. */
-  //                   , math::hartree * math::avogadro / math::bohr /* a.u. */
-  //                   , math::echarge /* e */}}
-  //   {simulation::qm_orca,
-  //                   { math::angstrom /* A */
-  //                   , math::hartree /* a.u. */
-  //                   , math::hartree / math::bohr /* a.u. */
-  //                   , math::echarge /* e */}}
-//   {simulation::qm_xtb,
-  //                   { math::bohr /* a.u. */
-  //                   , math::hartree /* a.u. */
-  //                   , math::hartree / math::bohr /* a.u. */
-  //                   , math::echarge /* e */}}
-  // };
-
   std::vector<std::string> buffer = m_block["QMUNIT"];
   if (!buffer.size()) {
     io::messages.add("no QMUNIT block in QM/MM specification file",
@@ -1184,7 +1296,7 @@ void io::In_QMMM::read_zone(topology::Topology& topo
   {
   std::vector<std::string> buffer;
   buffer = m_block[blockname];
-
+  
   if (!buffer.size()) {
     if (blockname == "QMZONE") {
       io::messages.add("No QMZONE block in QM/MM specification file",
@@ -1200,18 +1312,29 @@ void io::In_QMMM::read_zone(topology::Topology& topo
   _lineStream.clear();
   _lineStream.str(line);
 
-  int charge, spin_mult;
+  int charge = 0, spin_mult = 0;
   
   _lineStream >> charge
               >> spin_mult;
   if (blockname == "BUFFERZONE") {
     _lineStream >> sim.param().qmmm.buffer_zone.cutoff;
+    if (sim.param().pairlist.skip_step > 1) {
+    // Adaptive QM buffer and skipping pairlist may suddenly appear/disappear particles
+      io::messages.add("BUFFERZONE block: With adaptive QM buffer, the pairlist should be generated every step"
+                      , "In_QMMM", io::message::warning);
+    }
     sim.param().qmmm.buffer_zone.charge = charge;
     sim.param().qmmm.buffer_zone.spin_mult = spin_mult;
   }
   else if (blockname == "QMZONE") {
     sim.param().qmmm.qm_zone.charge = charge;
     sim.param().qmmm.qm_zone.spin_mult = spin_mult;
+  }
+  else {
+    std::ostringstream msg;
+    msg << blockname << " block not implemented";
+    io::messages.add(msg.str(), "In_QMMM", io::message::critical);
+    return;
   }
 
   if (_lineStream.fail()) {
@@ -1222,7 +1345,7 @@ void io::In_QMMM::read_zone(topology::Topology& topo
   }
   // Count number of electrons and check consistency with charge and multiplicity
   int num_elec = -charge;
-  unsigned qmi, qmz, qmli;
+  unsigned qmi = 0, qmz = 0, qmli = 0;
   for (std::vector<std::string>::const_iterator it = buffer.begin() + 2
                                               , to = buffer.end() - 1
                                               ; it != to; ++it) {
@@ -1258,7 +1381,7 @@ void io::In_QMMM::read_zone(topology::Topology& topo
     if ((blockname == "QMZONE")
         && (qmi > topo.num_solute_atoms())) {
       std::ostringstream msg;
-      msg << blockname << " block: QM atom should be in solute";
+      msg << blockname << " block: solvent in QMZONE is not supported (atom " << qmi << ")";
       io::messages.add(msg.str(), "In_QMMM", io::message::error);
       return;
     }
@@ -1285,6 +1408,18 @@ void io::In_QMMM::read_zone(topology::Topology& topo
       std::ostringstream msg;
       msg << blockname << " block: atom " << qmi
           << " cannot be both in QM and buffer zone";
+      io::messages.add(msg.str(), "In_QMMM", io::message::error);
+      return;
+    }
+
+    if (is_qm_buffer
+        && (sim.param().qmmm.qm_ch == simulation::qm_ch_dynamic)
+        && (sim.param().innerloop.method != simulation::sla_off)
+        && (qmi > topo.num_solute_atoms())) {
+      std::ostringstream msg;
+      msg << blockname 
+          << " block: dynamic QM charge for solvent atoms cannot be used"
+          << " with non-default solvent loops";
       io::messages.add(msg.str(), "In_QMMM", io::message::error);
       return;
     }

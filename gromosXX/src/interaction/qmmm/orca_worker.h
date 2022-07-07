@@ -61,7 +61,7 @@ namespace interaction {
     int process_input(const topology::Topology& topo
                   , const configuration::Configuration& conf
                   , const simulation::Simulation& sim
-                  , const interaction::QM_Zone& qm_zone);
+                  , const interaction::QM_Zone& qm_zone) override;
 
     /**
      * Write input parameter file
@@ -130,7 +130,7 @@ namespace interaction {
     /**
      * Call external QM program - Orca
      */
-    int run_calculation();
+    int run_calculation() override;
 
     /**
      * Read output file from the QM program
@@ -142,7 +142,7 @@ namespace interaction {
     int process_output(topology::Topology& topo
                   , configuration::Configuration& conf
                   , simulation::Simulation& sim
-                  , interaction::QM_Zone& qm_zone);
+                  , interaction::QM_Zone& qm_zone) override;
     
     /**
      * Parse charges
@@ -177,14 +177,14 @@ namespace interaction {
      * @param ofs ifstream from the output file
      * @param force reference for writing the force
      */
-    int parse_gradient1(std::ifstream& ofs, math::Vec& force) const;
+    int parse_gradient1D(std::ifstream& ofs, math::Vec& force) const;
 
     /**
      * Parse gradient line of QM or MM atom (x,y,z components in three lines)
      * @param ofs ifstream from the output file
      * @param force reference for writing the force
      */
-    int parse_gradient3(std::ifstream& ofs, math::Vec& force) const;
+    int parse_gradient3D(std::ifstream& ofs, math::Vec& force) const;
   };
 }
 

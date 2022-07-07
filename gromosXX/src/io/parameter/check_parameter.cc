@@ -469,7 +469,7 @@ int io::check_features(simulation::Simulation  &sim)
   add("parallel_mpi", "MPI parallelization", sim.mpi);
   int size = 1;
 #ifdef OMP
-    int tid;
+    int tid = 0;
 #pragma omp parallel private(tid)
     {
       tid = omp_get_thread_num();
@@ -4623,7 +4623,7 @@ int io::check_features(simulation::Simulation  &sim)
   fc.unlock("qmmm", "pbc_r");
   fc.unlock("qmmm", "pbc_c");
   fc.unlock("qmmm", "pbc_t");
-  //fc.unlock("qmmm", "perturbation");
+  fc.unlock("qmmm", "perturbation");
   //fc.unlock("qmmm", "perturbation_scaling");
   fc.unlock("qmmm", "slow_growth");
   //fc.unlock("qmmm", "individual_lambdas");

@@ -38,7 +38,7 @@ namespace interaction {
     virtual int init(const topology::Topology& topo
                    , const configuration::Configuration& conf
                    , simulation::Simulation& sim
-                   , const interaction::QM_Zone& qm_zone); 
+                   , const interaction::QM_Zone& qm_zone) override; 
 
   private:
     /**
@@ -56,12 +56,12 @@ namespace interaction {
     int process_input(const topology::Topology& topo
                   , const configuration::Configuration& conf
                   , const simulation::Simulation& sim
-                  , const interaction::QM_Zone& qm_zone);
+                  , const interaction::QM_Zone& qm_zone) override;
 
     /**
      * System call - MNDO
      */
-    int run_calculation();
+    int run_calculation() override;
 
     /**
      * Read outputs
@@ -69,7 +69,7 @@ namespace interaction {
     int process_output(topology::Topology& topo
                   , configuration::Configuration& conf
                   , simulation::Simulation& sim
-                  , interaction::QM_Zone& qm_zone);
+                  , interaction::QM_Zone& qm_zone) override;
 
     /**
      * Write QM atom

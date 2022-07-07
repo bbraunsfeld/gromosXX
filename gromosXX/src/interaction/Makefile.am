@@ -1,5 +1,6 @@
-AM_CXXFLAGS = @MY_CXXFLAGS@
+AM_CXXFLAGS = @MY_CXXFLAGS@ $(PYFLAGS)
 AM_CPPFLAGS = -I$(top_srcdir) -I$(top_srcdir)/src -I$(top_srcdir)/src/interaction -I$(top_srcdir)/src/interaction/nonbonded -I$(top_srcdir)/src/interaction/nonbonded/pairlist -I$(top_srcdir)/src/interaction/nonbonded/interaction -I$(top_srcdir)/src/interaction/bonded -I$(top_srcdir)/src/interaction/forcefield -I$(top_srcdir)/src/interaction/qmmm -I$(top_srcdir)/src/interaction/special -I$(top_srcdir)/src/interaction/special/xray -I$(top_srcdir)/src/algorithm 
+AM_LDFLAGS = $(PYLDFLAGS)
 
 if WITH_CUDA
   AM_CPPFLAGS += -I$(top_srcdir)/src/cukernel
@@ -122,6 +123,7 @@ xxintqmmm_HEADERS = qmmm/mm_atom.h\
 	qmmm/gaussian_worker.h\
 	qmmm/orca_worker.h\
 	qmmm/xtb_worker.h\
+	qmmm/nn_worker.h\
 	qmmm/qmmm_interaction.h\
 	qmmm/nonbonded/qmmm_nonbonded_outerloop.h \
 	qmmm/nonbonded/qmmm_nonbonded_set.h
@@ -207,6 +209,7 @@ libgrointeraction_la_SOURCES =interaction.cc\
 	qmmm/gaussian_worker.cc\
 	qmmm/orca_worker.cc\
 	qmmm/xtb_worker.cc\
+	qmmm/nn_worker.cc\
 	qmmm/qmmm_interaction.cc\
 	qmmm/nonbonded/qmmm_nonbonded_outerloop.cc\
 	qmmm/nonbonded/qmmm_nonbonded_set.cc

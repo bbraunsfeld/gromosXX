@@ -27,6 +27,7 @@
 #include "gaussian_worker.h"
 #include "orca_worker.h"
 #include "xtb_worker.h"
+#include "nn_worker.h"
 
 #undef MODULE
 #undef SUBMODULE
@@ -62,6 +63,8 @@ interaction::QM_Worker * interaction::QM_Worker::get_instance(const simulation::
       return new MOPAC_Worker;
     case simulation::qm_gaussian :
       return new Gaussian_Worker;
+    case simulation::qm_nn :
+      return new NN_Worker;
     case simulation::qm_orca :
       return new Orca_Worker;
     case simulation::qm_xtb :

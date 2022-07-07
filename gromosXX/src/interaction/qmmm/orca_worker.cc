@@ -403,7 +403,7 @@ int interaction::Orca_Worker::parse_qm_gradients(std::ifstream& ofs, interaction
   for (std::set<QM_Atom>::iterator it = qm_zone.qm.begin(), to = qm_zone.qm.end();
        it != to; ++it) {
     DEBUG(15, "Parsing gradients of QM atom " << it->index);
-    int err = this->parse_gradient1(ofs, it->force);
+    int err = this->parse_gradient1D(ofs, it->force);
     DEBUG(15, "Force: " << math::v2s(it->force));
     if (err) {
       std::ostringstream msg;
@@ -417,7 +417,7 @@ int interaction::Orca_Worker::parse_qm_gradients(std::ifstream& ofs, interaction
   for (std::set<QM_Link>::iterator
          it = qm_zone.link.begin(), to = qm_zone.link.end(); it != to; ++it) {
     DEBUG(15, "Parsing gradient of capping atom " << it->qm_index << "-" << it->mm_index);
-    int err = this->parse_gradient1(ofs, it->force);
+    int err = this->parse_gradient1D(ofs, it->force);
     DEBUG(15, "Force: " << math::v2s(it->force));
     if (err) {
       std::ostringstream msg;
@@ -502,7 +502,7 @@ int interaction::Orca_Worker::parse_mm_gradients(std::ifstream& ofs, interaction
   for (std::set<MM_Atom>::iterator
          it = qm_zone.mm.begin(), to = qm_zone.mm.end(); it != to; ++it) {
     DEBUG(15,"Parsing gradient of MM atom " << it->index);
-    int err = this->parse_gradient3(ofs, it->force);
+    int err = this->parse_gradient3D(ofs, it->force);
     DEBUG(15, "Force: " << math::v2s(it->force));
     if (err) {
       std::ostringstream msg;
@@ -513,7 +513,7 @@ int interaction::Orca_Worker::parse_mm_gradients(std::ifstream& ofs, interaction
     }
     if (it->is_polarisable) {
       DEBUG(15,"Parsing gradient of COS of MM atom " << it->index);
-      int err = this->parse_gradient3(ofs, it->cos_force);
+      int err = this->parse_gradient3D(ofs, it->cos_force);
       DEBUG(15, "Force: " << math::v2s(it->cos_force));
       if (err) {
         std::ostringstream msg;
@@ -527,7 +527,7 @@ int interaction::Orca_Worker::parse_mm_gradients(std::ifstream& ofs, interaction
   return 0;
 }
 
-int interaction::Orca_Worker::parse_gradient1(std::ifstream& ofs,
+int interaction::Orca_Worker::parse_gradient1D(std::ifstream& ofs,
                                                   math::Vec& force) const {
   std::string line;
   for (unsigned int i = 0; i < 3; ++i) {
@@ -545,7 +545,7 @@ int interaction::Orca_Worker::parse_gradient1(std::ifstream& ofs,
     return 0;
 }
 
-int interaction::Orca_Worker::parse_gradient3(std::ifstream& ofs,
+int interaction::Orca_Worker::parse_gradient3D(std::ifstream& ofs,
                                                   math::Vec& force) const {
   std::string line;
   if (!std::getline(ofs, line)) {
