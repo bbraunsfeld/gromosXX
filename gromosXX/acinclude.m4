@@ -467,7 +467,7 @@ EOF
 dnl check for lib XTB
 AC_DEFUN([AM_PATH_XTB],[
   AC_ARG_WITH(xtb,
-    [  --with-xtb=DIR         Xtb library directory to use],
+    [  --with-xtb=DIR         xtb library directory to use],
     [
       [CXXFLAGS="$CXXFLAGS -I${withval}/include -L${withval}/lib"]
       [LDFLAGS="$LDFLAGS -L${withval}/lib"]
