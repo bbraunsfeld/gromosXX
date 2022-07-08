@@ -472,13 +472,18 @@ AC_DEFUN([AM_PATH_XTB],[
     [
       [CXXFLAGS="$CXXFLAGS -I${withval}/include -L${withval}/build"]
       [LDFLAGS="$LDFLAGS -L${withval}/lib"]
+      dnl check for lib with these settings and add flags automatically
+      AC_CHECK_LIB([xtb], [xtb_getAPIVersion],, AC_MSG_ERROR([xtb library not found or not functional.]))
+      AC_MSG_NOTICE([Compiling with XTB support.])
+      AC_DEFINE([WITH_XTB],[1],[XTB QM Library])
+      with_xtb=yes
     ],
     [
-      AC_MSG_WARN([xtb path was not specified. Trying default paths...])
+      AC_MSG_WARN([XTB path was not specified. XTB support disabled.])
+      with_xtb=no
     ]
   )
-  dnl check for lib with these settings and add flags automatically
-  AC_CHECK_LIB([xtb], [xtb_getAPIVersion],, AC_MSG_ERROR([xtb library missing.]))
+  AM_CONDITIONAL([WITH_XTB], [test x$with_xtb = xyes])
 ])
 
 dnl allow for schnetpack

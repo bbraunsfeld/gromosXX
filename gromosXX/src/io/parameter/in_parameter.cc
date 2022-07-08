@@ -5329,7 +5329,14 @@ void io::In_Parameter::read_QMMM(simulation::Parameter & param,
             param.qmmm.software = simulation::qm_orca;
             break;
         case 7:
+#ifdef WITH_XTB
             param.qmmm.software = simulation::qm_xtb;
+#else       
+            io::messages.add("QMMM block: XTB interface is not available "
+                                "in your compilation. Use --with-xtb=PATH/TO/XTB for compiling.",
+                                "In_Parameter", io::message::error);   
+#endif
+            break;
         default:
             break;
     }

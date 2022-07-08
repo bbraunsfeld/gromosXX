@@ -422,8 +422,11 @@ int interaction::QMMM_Interaction::init(topology::Topology& topo,
       case simulation::qm_orca:
         os << "Orca";
         break;
+#ifdef WITH_XTB
       case simulation::qm_xtb:
         os << "XTB";
+        break;
+#endif
       default:
         os << "unknown";
         break;

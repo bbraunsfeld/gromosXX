@@ -486,12 +486,14 @@ END
  * 
  * XTBOPTIONS block for the XTB worker
  * The XTBOPTIONS block specifies options for the XTB worker
- * Supported are selection of the Hamiltonian: 1 or 2 (for GFN1-xTB or GFN2-xTB, respectively)
+ * Supported are selection of the Hamiltonian (GFNHAM): 1 or 2 for 
+ * GFN1-xTB or GFN2-xTB, respectively and verbosity level: 
+ * 0 (none), 1 (minimimal), and 2 (full) (XVERBO)
  *
  @verbatim
 XTBOPTIONS
-# GFNH
-  1
+# GFNHAM    XVERBO
+       1         1
 END
  @endverbatim
  */
