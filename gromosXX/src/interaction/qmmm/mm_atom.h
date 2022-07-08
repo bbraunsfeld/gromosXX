@@ -21,7 +21,7 @@ namespace interaction {
      */
     MM_Atom(unsigned index
           , math::Vec pos = {0.0,0.0,0.0}
-          , unsigned atomic_number = 1
+          , unsigned atomic_number = 0
           , double charge = 0.0
           , math::Vec force = {0.0,0.0,0.0}
           , double cos_charge = 0.0

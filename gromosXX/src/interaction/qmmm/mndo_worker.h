@@ -77,42 +77,42 @@ namespace interaction {
     void write_qm_atom(std::ofstream& inputfile_stream
                   , const int atomic_number
                   , const math::Vec& pos
-                  , const int opt_flag = 0);
+                  , const int opt_flag = 0) const;
 
     /**
      * Write MM atom
      */
     void write_mm_atom(std::ofstream& inputfile_stream
                       , const math::Vec& pos
-                      , const double charge);
+                      , const double charge) const;
 
     /**
      * Parse charges
      */
-    int parse_charges(std::ifstream& ofs, interaction::QM_Zone& qm_zone);
+    int parse_charges(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse coordinates
      */
-    int parse_coordinates(std::ifstream& ofs, interaction::QM_Zone& qm_zone);
+    int parse_coordinates(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse energy
      */
-    int parse_energy(std::ifstream& ofs, interaction::QM_Zone& qm_zone);
+    int parse_energy(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse gradients
      */
     int parse_gradients(const simulation::Simulation& sim
                       , std::ifstream& ofs
-                      , interaction::QM_Zone& qm_zone);
+                      , interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse gradient line
      */
     int parse_gradient(std::ifstream& ofs
-                     , math::Vec& force);
+                     , math::Vec& force) const;
   };
 }
 

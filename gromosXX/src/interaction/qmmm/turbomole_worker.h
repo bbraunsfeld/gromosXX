@@ -41,6 +41,7 @@ namespace interaction {
                    , const interaction::QM_Zone& qm_zone) override; 
 
     private:
+    
     /**
      * Current working directory (where GROMOS is called from)
      */

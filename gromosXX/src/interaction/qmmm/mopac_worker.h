@@ -13,6 +13,7 @@ namespace interaction {
    * a worker class which calls the MOPAC software
    */
   class MOPAC_Worker : public QM_Worker {
+
   public:
     /**
      * Constructor
@@ -53,12 +54,12 @@ namespace interaction {
     int process_input(const topology::Topology& topo
                   , const configuration::Configuration& conf
                   , const simulation::Simulation& sim
-                  , const interaction::QM_Zone& qm_zone);
+                  , const interaction::QM_Zone& qm_zone) override;
 
     /**
      * System call - MOPAC
      */
-    int run_calculation();
+    int run_calculation() override;
 
     /**
      * Read outputs
@@ -66,7 +67,7 @@ namespace interaction {
     int process_output(topology::Topology& topo
                   , configuration::Configuration& conf
                   , simulation::Simulation& sim
-                  , interaction::QM_Zone& qm_zone);
+                  , interaction::QM_Zone& qm_zone) override;
 
     /**
      * Write QM atom

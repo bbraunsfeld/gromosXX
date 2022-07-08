@@ -35,8 +35,7 @@ interaction::QM_Zone::QM_Zone(int net_charge
                               , m_spin_mult(spin_mult)
 {}
 
-interaction::QM_Zone::~QM_Zone()
-{}
+interaction::QM_Zone::~QM_Zone() = default;
 
 void interaction::QM_Zone::zero() {
   this->m_qm_energy = 0.0; 

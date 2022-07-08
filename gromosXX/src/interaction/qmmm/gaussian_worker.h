@@ -56,12 +56,12 @@ namespace interaction {
     int process_input(const topology::Topology& topo
                   , const configuration::Configuration& conf
                   , const simulation::Simulation& sim
-                  , const interaction::QM_Zone& qm_zone);
+                  , const interaction::QM_Zone& qm_zone) override;
 
     /**
      * System call
      */
-    int run_calculation();
+    int run_calculation() override;
 
     /**
      * Read outputs
@@ -69,7 +69,7 @@ namespace interaction {
     int process_output(topology::Topology& topo
                   , configuration::Configuration& conf
                   , simulation::Simulation& sim
-                  , interaction::QM_Zone& qm_zone);
+                  , interaction::QM_Zone& qm_zone) override;
 
     /**
      * Write QM atom
@@ -94,30 +94,30 @@ namespace interaction {
     /**
      * Parse charges
      */
-    int parse_charges(std::ifstream& ofs, interaction::QM_Zone& qm_zone);
+    int parse_charges(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse coordinates
      */
-    int parse_coordinates(std::ifstream& ofs, interaction::QM_Zone& qm_zone);
+    int parse_coordinates(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse energy
      */
-    int parse_energy(std::ifstream& ofs, interaction::QM_Zone& qm_zone);
+    int parse_energy(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const;
 
     /**
      * Parse forces
      */
     int parse_forces(const simulation::Simulation& sim
                   , std::ifstream& ofs
-                  , interaction::QM_Zone& qm_zone);
+                  , interaction::QM_Zone& qm_zone) const;
     
     /**
      * Parse force line
      */
     int parse_force(std::ifstream& ofs
-                  , math::Vec& force);
+                  , math::Vec& force) const;
   };
 }
 

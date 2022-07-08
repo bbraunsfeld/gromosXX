@@ -35,9 +35,10 @@ namespace interaction {
     virtual int init(const topology::Topology& topo
                    , const configuration::Configuration& conf
                    , simulation::Simulation& sim
-                   , const interaction::QM_Zone& qm_zone); 
+                   , const interaction::QM_Zone& qm_zone) override; 
 
   private:
+  
     /**
      * Pointer to simulation parameters
      */

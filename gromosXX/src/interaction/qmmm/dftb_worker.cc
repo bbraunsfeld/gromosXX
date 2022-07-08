@@ -46,8 +46,7 @@ int interaction::DFTB_Worker::init(const topology::Topology& topo
   // Change to working directory and create the input file
   if (this->chdir(this->param->working_directory) != 0) return 1;
   std::ofstream ifs;
-  int err = 0;
-  err = this->open_input(ifs, this->param->input_file);
+  int err = this->open_input(ifs, this->param->input_file);
   if (err) return err;
   ifs << this->param->input_header;
   // Change back to GromosXX directory
@@ -61,8 +60,7 @@ int interaction::DFTB_Worker::process_input(const topology::Topology& topo
                                         , const interaction::QM_Zone& qm_zone) {
   if (this->chdir(this->param->working_directory) != 0) return 1;
   std::ofstream ifs;
-  int err = 0;
-  err = this->open_input(ifs, this->param->input_coordinate_file);
+  int err = this->open_input(ifs, this->param->input_coordinate_file);
   if (err) return err;
 
   unsigned qm_size = qm_zone.qm.size() + qm_zone.link.size();
@@ -190,9 +188,8 @@ int interaction::DFTB_Worker::process_output(topology::Topology& topo
                                         , simulation::Simulation& sim
                                         , interaction::QM_Zone& qm_zone) {
   std::ifstream ofs;
-  int err = 0;
-
-  err = this->open_output(ofs, this->param->output_file);
+  
+  int err = this->open_output(ofs, this->param->output_file);
   if (err) return err;
 
   err = this->parse_energy(ofs, qm_zone);

@@ -163,8 +163,7 @@ int interaction::MNDO_Worker::process_input(const topology::Topology& topo
                                         , const interaction::QM_Zone& qm_zone)
   {
   std::ofstream ifs;
-  int err = 0;
-  err = this->open_input(ifs, this->param->input_file);
+  int err = this->open_input(ifs, this->param->input_file);
   if (err) return err;
   std::string header(this->param->input_header);
   
@@ -260,8 +259,7 @@ int interaction::MNDO_Worker::process_output(topology::Topology& topo
                                         , simulation::Simulation& sim
                                         , interaction::QM_Zone& qm_zone) {
   std::ifstream ofs;
-  int err = 0;
-  err = this->open_output(ofs, this->param->output_file);
+  int err = this->open_output(ofs, this->param->output_file);
   if (err) return err;
   
   if (sim.param().qmmm.qmmm == simulation::qmmm_mechanical
@@ -294,7 +292,7 @@ int interaction::MNDO_Worker::process_output(topology::Topology& topo
 void interaction::MNDO_Worker::write_qm_atom(std::ofstream& inputfile_stream
                                         , const int atomic_number
                                         , const math::Vec& pos
-                                        , const int opt_flag)
+                                        , const int opt_flag) const
   {
 /*
       a(1,i)    11-20  f10.5  First coordinate.
@@ -324,7 +322,7 @@ void interaction::MNDO_Worker::write_qm_atom(std::ofstream& inputfile_stream
 
 void interaction::MNDO_Worker::write_mm_atom(std::ofstream& inputfile_stream
                                         , const math::Vec& pos
-                                        , const double charge)
+                                        , const double charge) const
   {
     /*
       cm(1,m)    1-12  f12.7  x coordinate.
@@ -340,7 +338,7 @@ void interaction::MNDO_Worker::write_mm_atom(std::ofstream& inputfile_stream
                    << std::endl;
 }
 
-int interaction::MNDO_Worker::parse_charges(std::ifstream& ofs, interaction::QM_Zone& qm_zone) {
+int interaction::MNDO_Worker::parse_charges(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const {
   std::string& out = this->param->output_file;
   std::string line;
   /**
@@ -408,7 +406,7 @@ int interaction::MNDO_Worker::parse_charges(std::ifstream& ofs, interaction::QM_
   return 0;
 }
 
-int interaction::MNDO_Worker::parse_coordinates(std::ifstream& ofs, interaction::QM_Zone& qm_zone) {
+int interaction::MNDO_Worker::parse_coordinates(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const {
   std::string& out_grad = this->param->output_gradient_file;
   std::string line;
   bool got_coordinates = false;
@@ -470,7 +468,7 @@ int interaction::MNDO_Worker::parse_coordinates(std::ifstream& ofs, interaction:
   return 0;
 }
 
-int interaction::MNDO_Worker::parse_energy(std::ifstream& ofs, interaction::QM_Zone& qm_zone) {
+int interaction::MNDO_Worker::parse_energy(std::ifstream& ofs, interaction::QM_Zone& qm_zone) const {
   std::string line;
   // Find energy block
   bool got_energy = false;
@@ -500,7 +498,7 @@ int interaction::MNDO_Worker::parse_energy(std::ifstream& ofs, interaction::QM_Z
 
 int interaction::MNDO_Worker::parse_gradients(const simulation::Simulation& sim
                                             , std::ifstream& ofs
-                                            , interaction::QM_Zone& qm_zone) {
+                                            , interaction::QM_Zone& qm_zone) const {
   std::string& out_grad = this->param->output_gradient_file;
   std::string line;
   int err = 0;
@@ -584,7 +582,7 @@ int interaction::MNDO_Worker::parse_gradients(const simulation::Simulation& sim
 }
 
 int interaction::MNDO_Worker::parse_gradient(std::ifstream& ofs,
-                                             math::Vec& force) {
+                                             math::Vec& force) const {
   std::string line;
   if (!std::getline(ofs, line)) {
     std::ostringstream msg;

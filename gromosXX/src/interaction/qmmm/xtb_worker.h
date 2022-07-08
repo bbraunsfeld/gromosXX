@@ -15,6 +15,7 @@ namespace interaction {
    * a worker class which calls the XTB software
    */
   class XTB_Worker : public QM_Worker {
+    
   public:
     /**
      * Constructor
@@ -40,7 +41,6 @@ namespace interaction {
                    , const interaction::QM_Zone& qm_zone) override; 
 
   private:
-
     /**
      * Write input files for QM program
      * @param topo Topology
@@ -187,7 +187,8 @@ namespace interaction {
     /**
      * These correspond to element types - required for XTB
      * calculations to match internally hard-coded hardness
-     * parameters: https://xtb-docs.readthedocs.io/en/latest/pcem.html 
+     * parameters: https://xtb-docs.readthedocs.io/en/latest/pcem.html and
+     * https://github.com/grimme-lab/xtb/pull/584#discussion_r814312190 
      */
     std::vector<int> numbers;
 

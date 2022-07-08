@@ -194,7 +194,7 @@ int interaction::NN_Worker::init(const topology::Topology& topo
   return 0;
 }
 
-interaction::NN_Worker::~NN_Worker() {}
+interaction::NN_Worker::~NN_Worker() = default;
 
 int interaction::NN_Worker::run_QM(topology::Topology& topo
                      , configuration::Configuration& conf

@@ -1,6 +1,7 @@
 /**
  * @file nn_worker.h
- * The worker class for the neural network interface
+ * The worker class for the neural network interface (SchNetPack)
+ * https://github.com/atomistic-machine-learning/schnetpack
  */
 #ifndef INCLUDED_NN_WORKER_H
 #define	INCLUDED_NN_WORKER_H
@@ -24,6 +25,7 @@ namespace interaction {
    * a worker class which calls the NN interface
    */
   class __attribute__((visibility("default"))) NN_Worker : public QM_Worker {
+
   public:
     /**
      * Constructor

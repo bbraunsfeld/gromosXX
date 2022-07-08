@@ -36,6 +36,7 @@ int interaction::Orca_Worker::init(const topology::Topology& topo
                                  , const configuration::Configuration& conf
                                  , simulation::Simulation& sim
                                  , const interaction::QM_Zone& qm_zone) {
+
   DEBUG(15, "Initializing " << this->name());
 
   // Get a pointer to simulation parameters
@@ -95,6 +96,7 @@ int interaction::Orca_Worker::init(const topology::Topology& topo
   std::string pcgrad_fname = fname + ".pcgrad";
 
   // other files that orca writes but we do not need
+  // there are potentially more
   std::string densities_fname = fname + ".densities";
   std::string gbw_fname = fname + ".gbw";
   std::string ges_fname = fname + ".ges";
@@ -102,8 +104,7 @@ int interaction::Orca_Worker::init(const topology::Topology& topo
 
 
   // initialize files
-  int err = 0;
-  err = this->initialize_file(out, out_fname);
+  int err = this->initialize_file(out, out_fname);
   if (err) return err;
 
   err = this->initialize_file(coordinates, coordinates_fname);
@@ -158,10 +159,9 @@ int interaction::Orca_Worker::process_input(const topology::Topology& topo
                                         , const simulation::Simulation& sim
                                         , const interaction::QM_Zone& qm_zone) {
   std::ofstream ifs;
-  int err;
-
+  
   // First create Orca input file
-  err = this->write_input_parameters(ifs, topo, conf, sim, qm_zone);
+  int err = this->write_input_parameters(ifs, topo, conf, sim, qm_zone);
   if (err) return err;
 
   // create xyz file with QM zone coordinates
@@ -313,10 +313,8 @@ int interaction::Orca_Worker::process_output(topology::Topology& topo
                                         , simulation::Simulation& sim
                                         , interaction::QM_Zone& qm_zone) {
   std::ifstream ofs;
-  int err;
-
   // parse energy
-  err = this->open_output(ofs, this->param->output_gradient_file);
+  int err = this->open_output(ofs, this->param->output_gradient_file);
   if (err) return err;
   err = this->parse_energy(ofs, qm_zone);
   if (err) return err;

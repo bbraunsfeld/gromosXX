@@ -59,7 +59,7 @@ int interaction::XTB_Worker::init(const topology::Topology& topo
   // size of the QM zone
   this->natoms = qm_zone.qm.size() + qm_zone.link.size();
 
-  // resize vectors
+  // resize vectors ahead of time
   this->attyp.resize(natoms);
   this->coord.resize(3 * natoms);
 
@@ -163,12 +163,13 @@ int interaction::XTB_Worker::process_input(const topology::Topology& topo
     // process point charges
     this->process_input_pointcharges(topo, conf, sim, qm_zone);
 
-    // set external charges
-    xtb_setExternalCharges(this->env, this->calc, &(this->ncharges), this->numbers.data(),
-                           this->charges.data(), this->point_charges.data());
-    if (xtb_checkEnvironment(this->env)) {
-        xtb_showEnvironment(this->env, NULL);
-        return 1;
+    if (this->ncharges > 0) { // set external charges only if > 0 ; otherwise xTB crashes
+      xtb_setExternalCharges(this->env, this->calc, &(this->ncharges), this->numbers.data(),
+                             this->charges.data(), this->point_charges.data());
+      if (xtb_checkEnvironment(this->env)) {
+          xtb_showEnvironment(this->env, NULL);
+          return 1;
+      }
     }
   }
 
@@ -265,7 +266,7 @@ int interaction::XTB_Worker::process_output(topology::Topology& topo
                   , simulation::Simulation& sim
                   , interaction::QM_Zone& qm_zone) {
 
-  if (sim.param().qmmm.qmmm > simulation::qmmm_mechanical) {
+  if (sim.param().qmmm.qmmm > simulation::qmmm_mechanical && this->ncharges > 0) {
     // release charges after successful run
     xtb_releaseExternalCharges(this->env, this->calc);
     if (xtb_checkEnvironment(this->env)) {
@@ -274,10 +275,8 @@ int interaction::XTB_Worker::process_output(topology::Topology& topo
     }
   }
 
-  int err;
-
   // parse energy
-  err = this->parse_energy(qm_zone);
+  int err = this->parse_energy(qm_zone);
   if (err) return err;
 
   // parse QM gradients
@@ -285,7 +284,7 @@ int interaction::XTB_Worker::process_output(topology::Topology& topo
   if (err) return err;
 
   // parse MM gradients or charges
-  if (sim.param().qmmm.qmmm > simulation::qmmm_mechanical) {
+  if (sim.param().qmmm.qmmm > simulation::qmmm_mechanical && this->ncharges > 0) {
     // also parse MM gradients
     err = this->parse_mm_gradients(qm_zone);
     if (err) return err;
