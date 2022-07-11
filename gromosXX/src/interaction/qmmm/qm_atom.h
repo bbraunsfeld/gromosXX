@@ -21,7 +21,7 @@ namespace interaction {
      */
     QM_Atom(unsigned index
          , math::Vec pos = {0.0,0.0,0.0}
-         , unsigned atomic_number = 0
+         , unsigned atomic_number = 1
          , bool is_linked = false
          ) : pos(pos)
            , force(0.0)
