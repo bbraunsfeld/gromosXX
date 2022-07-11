@@ -471,7 +471,7 @@ AC_DEFUN([AM_PATH_XTB],[
     [  --with-xtb=DIR         xtb library directory to use],
     [
       [CXXFLAGS="$CXXFLAGS -I${withval}/include -L${withval}/build"]
-      [LDFLAGS="$LDFLAGS -L${withval}/lib"]
+      [LDFLAGS="$LDFLAGS -L${withval}/build"]
       dnl check for lib with these settings and add flags automatically
       AC_CHECK_LIB([xtb], [xtb_getAPIVersion],, AC_MSG_ERROR([xtb library not found or not functional.]))
       AC_MSG_NOTICE([Compiling with XTB support.])
