@@ -105,6 +105,20 @@ namespace simulation
       B_overall_on = 1,
   };
   /**
+   * @enum dfunct_enum
+   * dfunct enum, useful for umbrella sampling of reaction transition states
+   */
+  enum dfunct_enum {
+    /**
+     * dfunct off
+     */
+    dfunct_off, 
+    /**
+     * dfunct on
+     */
+    dfunct_on
+  };
+  /**
    * @enum special_loop_enum
    * special solvent loop
    */
@@ -4174,6 +4188,44 @@ namespace simulation
        */
       double coulomb_scaling;
     } amber;
+
+    struct dfunct_struct {
+
+      dfunct_struct() : dfunct(dfunct_off), atom_1(0), atom_2(0), atom_3(0), atom_4(0), target(0.0), d(0), force(0.0) {}
+
+      /**
+       * dfunct enum 
+       */
+      dfunct_enum dfunct;
+      /**
+       * index of first atom involved in the potential
+       */
+      int atom_1, 
+      /**
+       * index of second atom involved in the potential
+       */
+      atom_2, 
+      /**
+       * index of third atom involved in the potential
+       */
+      atom_3, 
+      /**
+       * index of fourth atom involved in the potential
+       */
+      atom_4;
+      /**
+       * combined target distance
+       */
+      double target;
+      /**
+       * addition or subtraction of distances r_12 and r_34
+       */
+      int d;
+      /**
+       * force constant of the bias
+       */
+      double force;
+    } dfunct;
     
     /**
      A struct to mark parts of the code as "under development"

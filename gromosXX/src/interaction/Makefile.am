@@ -31,9 +31,9 @@ xxintbonded_HEADERS = bonded/create_bonded.h\
 	bonded/perturbed_soft_bond_interaction.h\
 	bonded/perturbed_cg_bond_interaction.h\
 	bonded/perturbed_angle_interaction.h\
-    bonded/perturbed_soft_angle_interaction.h\
+  bonded/perturbed_soft_angle_interaction.h\
 	bonded/perturbed_improper_dihedral_interaction.h\
-    bonded/perturbed_soft_improper_interaction.h\
+  bonded/perturbed_soft_improper_interaction.h\
 	bonded/perturbed_dihedral_new_interaction.h\
 	bonded/perturbed_dihedral_interaction.h
 
@@ -103,7 +103,8 @@ xxintnbspecial_HEADERS = special/create_special.h\
 	special/nemd.h\
 	special/order_parameter_restraint_interaction.h\
 	special/rdc_restraint_interaction.h\
-	special/symmetry_restraint_interaction.h
+	special/symmetry_restraint_interaction.h\
+	special/dfunct_interaction.h
 
 xxintspecialxraydir = $(includedir)/md++/interaction/special/xray
 xxintspecialxray_HEADERS = special/xray/dens.h\
@@ -197,6 +198,7 @@ libgrointeraction_la_SOURCES =interaction.cc\
 	special/order_parameter_restraint_interaction.cc\
 	special/rdc_restraint_interaction.cc\
 	special/symmetry_restraint_interaction.cc\
+	special/dfunct_interaction.cc\
 	qmmm/qm_link.cc\
 	qmmm/qm_zone.cc\
 	qmmm/qm_worker.cc\

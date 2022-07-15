@@ -108,6 +108,7 @@ void io::In_Parameter::read(simulation::Parameter &param,
   read_QMMM(param);
   read_SYMRES(param);
   read_AMBER(param);
+  read_DFUNCT(param);
 
   read_known_unsupported_blocks();
 
@@ -5585,3 +5586,65 @@ void io::In_Parameter::read_AMBER(simulation::Parameter & param,
   } // if block
 
 } // AMBER
+
+/**
+ * @section dfunct DFUNCT block
+ * @snippet snippets/snippets.cc DFUNCT
+
+ */
+void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream & os ) {
+    DEBUG(8, "read DFUNCT");
+
+std::stringstream exampleblock;
+    // lines starting with 'exampleblock<<"' and ending with '\n";' (spaces don't matter)
+    // will be used to generate snippets that can be included in the doxygen doc;
+    // the first line is the tag
+    exampleblock << "DFUNCT\n";
+    exampleblock << "# DFUNCT 0..1 apply DFUNCT\n";
+    exampleblock << "#    0: do not apply DFUNCT\n";
+    exampleblock << "#    1: apply DFUNCT\n";
+    exampleblock << "# DATOMA 1..N Index of first atom to restrain\n";
+    exampleblock << "# DATOMB 1..N Index of second atom to restrain\n";
+    exampleblock << "# DATOMC 1..N Index of third atom to restrain\n";
+    exampleblock << "# DATOMD 1..N Index of fourth atom to restrain\n";
+    exampleblock << "# DTARG >= 0 Combined target distance\n";
+    exampleblock << "# DFUNCD: Add or subtract atomic distances\n";
+    exampleblock << "#     1: add R_kl to R_ij\n";
+    exampleblock << "#    -1: subtract R_kl from R_ij\n";
+    exampleblock << "# DFFORC >= 0 Force constant to restrain distance\n";
+    exampleblock << "#\n";
+    exampleblock << "# DFUNCT  DATOMA  DATOMB  DATOMC  DATOMD  DFTARG  DFUNCD  DFFORC\n";
+    exampleblock << "       1       1       2       0       0     0.0      -1   20000\n";
+    exampleblock << "END\n";
+
+    std::vector<std::string> buffer;
+    std::string s;
+    buffer = m_block["DFUNCT"];
+    if (buffer.size()) {
+      block_read.insert("DFUNCT");
+      _lineStream.clear();
+      _lineStream.str(concatenate(buffer.begin() + 1, buffer.end() -1, s));
+      int enable = 0;
+      int atom_1 = 0, atom_2 = 0, atom_3 = 0, atom_4 = 0, dt = 0, t = 0, d = 0;
+      double target = 0.0, force = 0.0;
+      _lineStream >> enable >> atom_1 >> atom_2 >> atom_3 >> atom_4 >> target >> d >> force;
+      if (_lineStream.fail()) {
+        io::messages.add("Bad line in DFUNCT block.", "In_Parameter", io::message::error);
+        return;
+      }
+      if (enable) {
+        param.dfunct.dfunct = simulation::dfunct_on;
+      }
+      if (force <= 0.0) {
+        io::messages.add("DFUNCT block: FORCE must be > 0", "In_Parameter", io::message::error);
+        return;
+      }
+      param.dfunct.atom_1 = atom_1;
+      param.dfunct.atom_2 = atom_2;
+      param.dfunct.atom_3 = atom_3;
+      param.dfunct.atom_4 = atom_4;
+      param.dfunct.target = target;
+      param.dfunct.d = d;
+      param.dfunct.force = force;
+  } // if block
+} // DFUNCT
