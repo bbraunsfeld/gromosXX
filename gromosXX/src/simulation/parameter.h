@@ -4191,7 +4191,7 @@ namespace simulation
 
     struct dfunct_struct {
 
-      dfunct_struct() : dfunct(dfunct_off), atom_1(0), atom_2(0), atom_3(0), atom_4(0), target(0.0), d(0), force(0.0) {}
+      dfunct_struct() : dfunct(dfunct_off), atom_i(0), atom_j(0), atom_k(0), atom_l(0), target(0.0), d(0), force(0.0) {}
 
       /**
        * dfunct enum 
@@ -4200,19 +4200,19 @@ namespace simulation
       /**
        * index of first atom involved in the potential
        */
-      int atom_1, 
+      int atom_i, 
       /**
        * index of second atom involved in the potential
        */
-      atom_2, 
+      atom_j, 
       /**
        * index of third atom involved in the potential
        */
-      atom_3, 
+      atom_k, 
       /**
        * index of fourth atom involved in the potential
        */
-      atom_4;
+      atom_l;
       /**
        * combined target distance
        */

@@ -37,34 +37,56 @@ template<math::boundary_enum B>
 static int _calculate_dfunct_interactions(topology::Topology& topo, 
 																					configuration::Configuration& conf, 
 																					simulation::Simulation& sim) {
-	int atom_1 = sim.param().dfunct.atom_1; 
-	int atom_2 = sim.param().dfunct.atom_2;
-	int atom_3 = sim.param().dfunct.atom_3;
-	int atom_4 = sim.param().dfunct.atom_4;
-	double target = sim.param().dfunct.target;
-	int d = sim.param().dfunct.d;
-	double force = sim.param().dfunct.force;
+	// shorten the code 
+	int    atom_i   = sim.param().dfunct.atom_i; 
+	int    atom_j   = sim.param().dfunct.atom_j;
+	int    atom_k   = sim.param().dfunct.atom_k;
+	int    atom_l   = sim.param().dfunct.atom_l;
+	double target   = sim.param().dfunct.target;
+	int    d        = sim.param().dfunct.d;
+	double force    = sim.param().dfunct.force;
+	DEBUG(10, "DFUNCT atom_i " << math::v2s(atom_i));
+	DEBUG(10, "DFUNCT atom_k " << math::v2s(atom_j));
+	DEBUG(10, "DFUNCT atom_k " << math::v2s(atom_k));
+	DEBUG(10, "DFUNCT atom_l " << math::v2s(atom_l));
+	// atomic distances expressed as vectors
+	math::Vec dist_vec_ij, dist_vec_kl, dist_vec_ijkl;
+	// find nearest periodic copies
 	math::Periodicity<B> periodicity(conf.current().box);
-	math::Vec dist_vec_12, dist_vec_34;
-	math::Vec dist_vec_3412;
-	periodicity.nearest_image(conf.current().pos(atom_1), -conf.current().pos(atom_2), dist_vec_12);
-	periodicity.nearest_image(conf.current().pos(atom_3), -conf.current().pos(atom_4), dist_vec_34);
-	dist_vec_12 = 0.5 * dist_vec_12;
-	dist_vec_34 = 0.5 * dist_vec_34;
-	periodicity.nearest_image(dist_vec_12, dist_vec_34, dist_vec_3412);
-	double dist_12 = math::abs(dist_vec_12);
-	double dist_34 = math::abs(dist_vec_34);
-	double dist_3412 = math::abs(dist_vec_3412);
-	math::Vec force_1, force_2, force_3, force_4;
-	force_1 = -force * dist_vec_3412 / dist_3412 * (dist_3412 - target);
-	force_2 =  force_1;
-	force_3 = -force_1;
-	force_4 = -force_1;
-	double V_bias = 0.5 * force * (dist_12 + d * dist_34) * (dist_12 + d * dist_34);
-	conf.current().force(atom_1) += force_1;
-	conf.current().force(atom_2) += force_2;
-	conf.current().force(atom_3) += force_3;
-	conf.current().force(atom_4) += force_4;
+	periodicity.nearest_image(conf.current().pos(atom_i), -conf.current().pos(atom_j), dist_vec_ij);
+	periodicity.nearest_image(conf.current().pos(atom_k), -conf.current().pos(atom_l), dist_vec_kl);
+	double dist_ij   = math::abs(dist_vec_ij);
+	double dist_kl   = math::abs(dist_vec_kl);
+	DEBUG(10, "DFUNCT dist_vec_ij " << math::v2s(dist_ij));
+	DEBUG(10, "DFUNCT dist_vec_kl " << math::v2s(dist_kl));
+	DEBUG(10, "DFUNCT dist_ij " << math::v2s(dist_ij));
+	DEBUG(10, "DFUNCT dist_kl " << math::v2s(dist_kl));
+	// scale distances
+	dist_vec_ij = 0.5 * dist_vec_ij;
+	dist_vec_kl = 0.5 * dist_vec_kl;
+	periodicity.nearest_image(dist_vec_ij, dist_vec_kl, dist_vec_ijkl);
+	double dist_ijkl = math::abs(dist_vec_ijkl);
+	DEBUG(10, "DFUNCT dist_vec_ijkl " << math::v2s(dist_vec_ijkl));
+	DEBUG(10, "DFUNCT dist_ijkl " << math::v2s(dist_ijkl));
+	// compute forces on atoms 1...4 and combined biasing potential
+	// the force is identical on all atoms - just the sign changes
+	// force: -k * (unit_vec) * (r_ij + d * r_kl - R_0) 
+	// https://pubs.acs.org/doi/pdf/10.1021/acs.jctc.0c01112 
+	math::Vec force_on_atoms = -force * dist_vec_ijkl / dist_ijkl * (dist_ij + d * dist_kl - target);
+	math::Vec force_i =  force_on_atoms;
+	math::Vec force_j =  force_on_atoms;
+	math::Vec force_k = -force_on_atoms;
+	math::Vec force_l = -force_on_atoms;
+	double V_bias = 0.5 * force * (dist_ij + d * dist_kl - target) * (dist_ij + d * dist_kl - target);
+	DEBUG(10, "DFUNCT Force on i " << math::v2s(force_i));
+  DEBUG(10, "DFUNCT Force on j " << math::v2s(force_j));
+  DEBUG(10, "DFUNCT Force on k " << math::v2s(force_k));
+  DEBUG(10, "DFUNCT Force on l " << math::v2s(force_l));
+	// store forces and biasing potential
+	conf.current().force(atom_i) += force_i;
+	conf.current().force(atom_j) += force_j;
+	conf.current().force(atom_k) += force_k;
+	conf.current().force(atom_l) += force_l;
 	conf.current().energies.distanceres_total += V_bias;
 	return 0;
 }
