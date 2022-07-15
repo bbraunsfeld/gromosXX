@@ -62,22 +62,26 @@ static int _calculate_dfunct_interactions(topology::Topology& topo,
 	DEBUG(10, "DFUNCT dist_ij " << math::v2s(dist_ij));
 	DEBUG(10, "DFUNCT dist_kl " << math::v2s(dist_kl));
 	// scale distances
-	dist_vec_ij = 0.5 * dist_vec_ij;
-	dist_vec_kl = 0.5 * dist_vec_kl;
+	dist_vec_ij_halfs = 0.5 * dist_vec_ij;
+	dist_vec_kl_halfs = 0.5 * dist_vec_kl;
 	periodicity.nearest_image(dist_vec_ij, dist_vec_kl, dist_vec_ijkl);
 	double dist_ijkl = math::abs(dist_vec_ijkl);
 	DEBUG(10, "DFUNCT dist_vec_ijkl " << math::v2s(dist_vec_ijkl));
 	DEBUG(10, "DFUNCT dist_ijkl " << math::v2s(dist_ijkl));
-	// compute forces on atoms 1...4 and combined biasing potential
-	// the force is identical on all atoms - just the sign changes
-	// force: -k * (unit_vec) * (r_ij + d * r_kl - R_0) 
+	// compute forces on atoms i, j, k, l and the combined biasing potential
+	// the force is identical on all atoms - only the sign changes
+	// force with respect to r_ij: k * (unit_vec) * (r_ij + d * r_kl - r_0)
+	// force with respect to r_kl: d * k * (unit_vec) * (r_ij + d * r_kl - r_0) 
 	// https://pubs.acs.org/doi/pdf/10.1021/acs.jctc.0c01112 
-	math::Vec force_on_atoms = -force * dist_vec_ijkl / dist_ijkl * (dist_ij + d * dist_kl - target);
-	math::Vec force_i =  force_on_atoms;
-	math::Vec force_j =  force_on_atoms;
-	math::Vec force_k = -force_on_atoms;
-	math::Vec force_l = -force_on_atoms;
+	// math::Vec force_i = force * (dist_vec_ijkl / dist_ijkl) * (dist_ij + d * dist_kl - target);
+	// math::Vec force_j = force_i;
+	// math::Vec force_k = d * force * (dist_vec_ijkl / dist_ijkl) * (dist_ij + d * dist_kl - target);
+	// math::Vec force_l = force_k;
 	double V_bias = 0.5 * force * (dist_ij + d * dist_kl - target) * (dist_ij + d * dist_kl - target);
+	math::Vec force_i = force * dist_vec_ijkl / dist_ijkl * (dist_ij + d * dist_kl - target);
+	math::Vec force_j = force_i;
+	math::Vec force_k = d * force_i;
+	math::Vec force_l = force_k;
 	DEBUG(10, "DFUNCT Force on i " << math::v2s(force_i));
   DEBUG(10, "DFUNCT Force on j " << math::v2s(force_j));
   DEBUG(10, "DFUNCT Force on k " << math::v2s(force_k));
