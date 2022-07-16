@@ -62,8 +62,8 @@ static int _calculate_dfunct_interactions(topology::Topology& topo,
 	DEBUG(10, "DFUNCT dist_ij " << math::v2s(dist_ij));
 	DEBUG(10, "DFUNCT dist_kl " << math::v2s(dist_kl));
 	// scale distances
-	dist_vec_ij_halfs = 0.5 * dist_vec_ij;
-	dist_vec_kl_halfs = 0.5 * dist_vec_kl;
+	math::Vec dist_vec_ij_halfs = 0.5 * dist_vec_ij;
+	math::Vec dist_vec_kl_halfs = 0.5 * dist_vec_kl;
 	periodicity.nearest_image(dist_vec_ij, dist_vec_kl, dist_vec_ijkl);
 	double dist_ijkl = math::abs(dist_vec_ijkl);
 	DEBUG(10, "DFUNCT dist_vec_ijkl " << math::v2s(dist_vec_ijkl));
