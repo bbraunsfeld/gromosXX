@@ -55,7 +55,7 @@ int interaction::create_special(interaction::Forcefield & ff,
 {
   // if (!quiet)
   // os << "SPECIAL\n";
-  if (param.dfunct.dfunct == simulation::dfunct_on) {
+  if (param.dfunct.dfunct > simulation::dfunct_off) {
     if (!quiet) {
       os << "\tDFUNCT\n";
     }

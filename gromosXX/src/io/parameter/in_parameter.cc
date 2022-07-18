@@ -5595,14 +5595,15 @@ void io::In_Parameter::read_AMBER(simulation::Parameter & param,
 void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream & os ) {
     DEBUG(8, "read DFUNCT");
 
-std::stringstream exampleblock;
+    std::stringstream exampleblock;
     // lines starting with 'exampleblock<<"' and ending with '\n";' (spaces don't matter)
     // will be used to generate snippets that can be included in the doxygen doc;
     // the first line is the tag
     exampleblock << "DFUNCT\n";
-    exampleblock << "# DFUNCT 0..1 apply DFUNCT\n";
+    exampleblock << "# DFUNCT 0..2 apply DFUNCT\n";
     exampleblock << "#    0: do not apply DFUNCT\n";
-    exampleblock << "#    1: apply DFUNCT\n";
+    exampleblock << "#    1: apply DFUNCT to restrain substitution type geometry\n";
+    exampleblock << "#    2: apply DFUNCT to restrain Diels-Alder type geometry\n";
     exampleblock << "# DATOMI 1..N Index of first atom to restrain\n";
     exampleblock << "# DATOMJ 1..N Index of second atom to restrain\n";
     exampleblock << "# DATOMK 1..N Index of third atom to restrain\n";
@@ -5617,35 +5618,47 @@ std::stringstream exampleblock;
     exampleblock << "       1       1       2       3       4     0.0      -1   20000\n";
     exampleblock << "END\n";
 
-    std::vector<std::string> buffer;
-    std::string s;
-    buffer = m_block["DFUNCT"];
-    if (buffer.size()) {
-      block_read.insert("DFUNCT");
-      _lineStream.clear();
-      _lineStream.str(concatenate(buffer.begin() + 1, buffer.end() -1, s));
-      int enable = 0;
-      int atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0, dt = 0, t = 0, d = 0;
-      double target = 0.0, force = 0.0;
-      _lineStream >> enable >> atom_i >> atom_j >> atom_k >> atom_l >> target >> d >> force;
-      if (_lineStream.fail()) {
-        io::messages.add("Bad line in DFUNCT block.", "In_Parameter", io::message::error);
+    std::string blockname = "DFUNCT";
+    Block block (blockname, exampleblock.str());
+    int dfunct, atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0;
+    double d = 0.0, target = 0.0, force = 0.0;
+    if (block.read_buffer(m_block[blockname], false) == 0) {
+      block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
+      block.get_next_parameter("DATOMI", atom_i, ">0", "");
+      block.get_next_parameter("DATOMJ", atom_j, ">0", "");
+      block.get_next_parameter("DATOMK", atom_k, ">0", "");
+      block.get_next_parameter("DATOML", atom_l, ">0", "");
+      block.get_next_parameter("DFTARG", target, ">0", "");
+      block.get_next_parameter("DFUNCD", d, ">=0.0 || <0.0", "");
+      block.get_next_parameter("DFFORC", force, ">0", "");
+    } // end if block
+
+    if (block.error()) {
+        block.get_final_messages();
         return;
-      }
-      if (enable) {
-        param.dfunct.dfunct = simulation::dfunct_on;
-      }
-      if (force <= 0.0) {
-        io::messages.add("DFUNCT block: FORCE must be > 0", "In_Parameter", io::message::error);
-        return;
-      }
-      // subtract 1 to translate from GROMOS topology to GROMOS C++ code
-      param.dfunct.atom_i = atom_i - 1;
-      param.dfunct.atom_j = atom_j - 1;
-      param.dfunct.atom_k = atom_k - 1;
-      param.dfunct.atom_l = atom_l - 1;
-      param.dfunct.target = target;
-      param.dfunct.d = d;
-      param.dfunct.force = force;
-  } // if block
+    }
+
+    switch (dfunct) {
+        case 0:
+            param.dfunct.dfunct = simulation::dfunct_off;
+            break;
+        case 1:
+            param.dfunct.dfunct = simulation::dfunct_substitution;
+            break;
+        case 2:
+            param.dfunct.dfunct = simulation::dfunct_diels_alder;
+            break;
+        default:
+            break;
+    }
+
+    param.dfunct.atom_i = (atom_i - 1);
+    param.dfunct.atom_j = (atom_j - 1);
+    param.dfunct.atom_k = (atom_k - 1);
+    param.dfunct.atom_l = (atom_l - 1);
+    param.dfunct.target = target;
+    param.dfunct.d = d;
+    param.dfunct.force = force;
+
+    block.get_final_messages();
 } // DFUNCT

@@ -106,7 +106,7 @@ namespace simulation
   };
   /**
    * @enum dfunct_enum
-   * dfunct enum, useful for umbrella sampling of reaction transition states
+   * dfunct enum, useful for sampling reaction transition states
    */
   enum dfunct_enum {
     /**
@@ -114,9 +114,13 @@ namespace simulation
      */
     dfunct_off, 
     /**
-     * dfunct on
+     * restrain substitution type geometry
      */
-    dfunct_on
+    dfunct_substitution,
+    /**
+     * restrain Diels-Alder type geometry
+     */
+    dfunct_diels_alder
   };
   /**
    * @enum special_loop_enum
@@ -4214,13 +4218,13 @@ namespace simulation
        */
       atom_l;
       /**
-       * combined target distance
+       * target distance
        */
       double target;
       /**
-       * addition or subtraction of distances r_12 and r_34
+       * addition or subtraction of distances r_ij and r_kl (can be scaled)
        */
-      int d;
+      double d;
       /**
        * force constant of the bias
        */

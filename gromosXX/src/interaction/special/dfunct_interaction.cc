@@ -34,9 +34,9 @@
 #define SUBMODULE special
 
 template<math::boundary_enum B>
-static int _calculate_dfunct_interactions(topology::Topology& topo, 
-																					configuration::Configuration& conf, 
-																					simulation::Simulation& sim) {
+static int _calculate_dfunct_substitution_form(topology::Topology& topo, 
+																					     configuration::Configuration& conf, 
+																					     simulation::Simulation& sim) {
 	// shorten the code 
 	int    atom_i   = sim.param().dfunct.atom_i; 
 	int    atom_j   = sim.param().dfunct.atom_j;
@@ -95,6 +95,13 @@ static int _calculate_dfunct_interactions(topology::Topology& topo,
 	return 0;
 }
 
+template<math::boundary_enum B>
+static int _calculate_dfunct_diels_alder_form(topology::Topology& topo, 
+																					     configuration::Configuration& conf, 
+																					     simulation::Simulation& sim) {
+	return 0;
+}
+
 int interaction::DFunct_Interaction::init(topology::Topology& topo,
 		     																  configuration::Configuration& conf,
 		     																  simulation::Simulation& sim,
@@ -106,6 +113,19 @@ int interaction::DFunct_Interaction::init(topology::Topology& topo,
 int interaction::DFunct_Interaction::calculate_interactions(topology::Topology & topo,
 				                                                    configuration::Configuration& conf,
 				                                                    simulation::Simulation& sim) {
-  SPLIT_BOUNDARY(_calculate_dfunct_interactions, topo, conf, sim);
+  switch (sim.param().dfunct.dfunct) {
+		case simulation::dfunct_substitution:
+			SPLIT_BOUNDARY(_calculate_dfunct_substitution_form, topo, conf, sim);
+			break;
+
+		case simulation::dfunct_diels_alder:
+			SPLIT_BOUNDARY(_calculate_dfunct_diels_alder_form, topo, conf, sim);
+			break;
+
+		default:
+      io::messages.add("DFunct functional not implemented", "DFunct_Interaction", io::message::critical);
+      break;
+		}
+	
 	return 0;
 }
