@@ -67,6 +67,7 @@
  * - @ref  qmmm
  * - @ref  xrayres
  * - @ref  amber
+ * - @ref  dfunct
  */
 
 

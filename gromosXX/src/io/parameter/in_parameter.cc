@@ -5620,36 +5620,38 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
 
     std::string blockname = "DFUNCT";
     Block block (blockname, exampleblock.str());
+    if (block.read_buffer(m_block[blockname], false) == 0) 
+        block_read.insert(blockname);
+
     int dfunct, atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0;
     double d = 0.0, target = 0.0, force = 0.0;
-    if (block.read_buffer(m_block[blockname], false) == 0) {
-      block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
-      block.get_next_parameter("DATOMI", atom_i, ">0", "");
-      block.get_next_parameter("DATOMJ", atom_j, ">0", "");
-      block.get_next_parameter("DATOMK", atom_k, ">0", "");
-      block.get_next_parameter("DATOML", atom_l, ">0", "");
-      block.get_next_parameter("DFTARG", target, ">0", "");
-      block.get_next_parameter("DFUNCD", d, ">=0.0 || <0.0", "");
-      block.get_next_parameter("DFFORC", force, ">0", "");
-    } // end if block
+
+    block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
+    block.get_next_parameter("DATOMI", atom_i, ">0", "");
+    block.get_next_parameter("DATOMJ", atom_j, ">0", "");
+    block.get_next_parameter("DATOMK", atom_k, ">0", "");
+    block.get_next_parameter("DATOML", atom_l, ">0", "");
+    block.get_next_parameter("DFTARG", target, "", "");
+    block.get_next_parameter("DFUNCD", d, ">0.0 || <0.0", "");
+    block.get_next_parameter("DFFORC", force, ">0", "");
 
     if (block.error()) {
-        block.get_final_messages();
-        return;
+      block.get_final_messages();
+      return;
     }
 
     switch (dfunct) {
-        case 0:
-            param.dfunct.dfunct = simulation::dfunct_off;
-            break;
-        case 1:
-            param.dfunct.dfunct = simulation::dfunct_substitution;
-            break;
-        case 2:
-            param.dfunct.dfunct = simulation::dfunct_diels_alder;
-            break;
-        default:
-            break;
+      case 0:
+          param.dfunct.dfunct = simulation::dfunct_off;
+          break;
+      case 1:
+          param.dfunct.dfunct = simulation::dfunct_substitution;
+          break;
+      case 2:
+          param.dfunct.dfunct = simulation::dfunct_diels_alder;
+          break;
+      default:
+          break;
     }
 
     param.dfunct.atom_i = (atom_i - 1);
