@@ -5263,61 +5263,61 @@ void io::In_Parameter::read_QMMM(simulation::Parameter & param,
     if (block.read_buffer(m_block[blockname], false) == 0) {
         block_read.insert(blockname);
 
+        int enable = 0,software = 0,write = 0,qmlj = 0,qmcon = 0;
+        double mm_scale = -1.;
+        double cutoff = 0.0;
+        block.get_next_parameter("NTQMMM", enable, "", "-1,0,1,2,3");
+        block.get_next_parameter("NTQMSW", software, "", "0,1,2,3,4,5,6,7");
+        block.get_next_parameter("RCUTQM", cutoff, "", "");
+        block.get_next_parameter("NTWQMMM", write, ">=0", "");
+        block.get_next_parameter("QMLJ", qmlj, "", "0,1");
+        block.get_next_parameter("QMCON", qmcon, "", "0,1");
+        block.get_next_parameter("MMSCALE", mm_scale, ">=0.0 || <0.0", "", true);
 
-    int enable = 0,software = 0,write = 0,qmlj = 0,qmcon = 0;
-    double mm_scale = -1.;
-    double cutoff = 0.0;
-    block.get_next_parameter("NTQMMM", enable, "", "-1,0,1,2,3");
-    block.get_next_parameter("NTQMSW", software, "", "0,1,2,3,4,5,6,7");
-    block.get_next_parameter("RCUTQM", cutoff, "", "");
-    block.get_next_parameter("NTWQMMM", write, ">=0", "");
-    block.get_next_parameter("QMLJ", qmlj, "", "0,1");
-    block.get_next_parameter("QMCON", qmcon, "", "0,1");
-    block.get_next_parameter("MMSCALE", mm_scale, ">=0.0 || <0.0", "", true);
 
-    if (block.error()) {
-        block.get_final_messages();
-        return;
-    }
-    switch(enable) {
-        case 0:
-            param.qmmm.qmmm = simulation::qmmm_off;
-            break;
-        case -1:
-            param.qmmm.qmmm = simulation::qmmm_mechanical;
-            param.qmmm.qm_ch = simulation::qm_ch_constant;
-            break;
-        case 1:
-            param.qmmm.qmmm = simulation::qmmm_mechanical;
-            param.qmmm.qm_ch = simulation::qm_ch_dynamic;
-            break;
-        case 2:
-            param.qmmm.qmmm = simulation::qmmm_electrostatic;
-            break;
-        case 3:
-            param.qmmm.qmmm = simulation::qmmm_polarisable;
-            break;
-        default:
-            break;
-    }
+        if (block.error()) {
+            block.get_final_messages();
+            return;
+        }
+        switch(enable) {
+            case 0:
+                param.qmmm.qmmm = simulation::qmmm_off;
+                break;
+            case -1:
+                param.qmmm.qmmm = simulation::qmmm_mechanical;
+                param.qmmm.qm_ch = simulation::qm_ch_constant;
+                break;
+            case 1:
+                param.qmmm.qmmm = simulation::qmmm_mechanical;
+                param.qmmm.qm_ch = simulation::qm_ch_dynamic;
+                break;
+            case 2:
+                param.qmmm.qmmm = simulation::qmmm_electrostatic;
+                break;
+            case 3:
+                param.qmmm.qmmm = simulation::qmmm_polarisable;
+                break;
+            default:
+                break;
+        }
 
-    switch (software) {
-        case 0:
-            param.qmmm.software = simulation::qm_mndo;
-            break;
-        case 1:
-            param.qmmm.software = simulation::qm_turbomole;
-            break;
-        case 2:
-            param.qmmm.software = simulation::qm_dftb;
-            break;
-        case 3:
-            param.qmmm.software = simulation::qm_mopac;
-            break;
-        case 4:
-            param.qmmm.software = simulation::qm_gaussian;
-            break;
-        case 5:
+        switch (software) {
+            case 0:
+                param.qmmm.software = simulation::qm_mndo;
+                break;
+            case 1:
+                param.qmmm.software = simulation::qm_turbomole;
+                break;
+            case 2:
+                param.qmmm.software = simulation::qm_dftb;
+                break;
+            case 3:
+                param.qmmm.software = simulation::qm_mopac;
+                break;
+            case 4:
+                param.qmmm.software = simulation::qm_gaussian;
+                break;
+            case 5:
 #ifdef HAVE_PYBIND11
             param.qmmm.software = simulation::qm_nn;
 #else
@@ -5342,44 +5342,44 @@ void io::In_Parameter::read_QMMM(simulation::Parameter & param,
             break;
     }
 
-    switch (qmlj) {
-        case 0:
-            param.qmmm.qm_lj = simulation::qm_lj_off;
-            break;
-        case 1:
-            param.qmmm.qm_lj = simulation::qm_lj_on;
-            break;
-        default:
-            break;
-    }
+        switch (qmlj) {
+            case 0:
+                param.qmmm.qm_lj = simulation::qm_lj_off;
+                break;
+            case 1:
+                param.qmmm.qm_lj = simulation::qm_lj_on;
+                break;
+            default:
+                break;
+        }
 
-    switch (qmcon) {
-        case 0:
-            param.qmmm.qm_constraint = simulation::qm_constr_off;
-            break;
-        case 1:
-            param.qmmm.qm_constraint = simulation::qm_constr_on;
-            break;
-        default:
-            break;
-    }
+        switch (qmcon) {
+            case 0:
+                param.qmmm.qm_constraint = simulation::qm_constr_off;
+                break;
+            case 1:
+                param.qmmm.qm_constraint = simulation::qm_constr_on;
+                break;
+            default:
+                break;
+        }
 
-    param.qmmm.mm_scale = mm_scale;
-    if (cutoff < 0.0)
-        param.qmmm.atomic_cutoff = true;
-    param.qmmm.cutoff = fabs(cutoff);
-    param.qmmm.write = write;
-    if (param.qmmm.qmmm != simulation::qmmm_mechanical && param.qmmm.software == simulation::qm_nn)
-        io::messages.add("QMMM block: Schnetpack NN works only with mechanical embedding scheme",
-            "io::In_Parameter",
-            io::message::error);
-    if (param.qmmm.qmmm == simulation::qmmm_mechanical && param.qmmm.cutoff != 0.0)
-        io::messages.add("QMMM block: RCUTQM > 0.0 has no effect for mechanical embedding scheme",
-            "In_Parameter",
-            io::message::warning);
+        param.qmmm.mm_scale = mm_scale;
+        if (cutoff < 0.0)
+            param.qmmm.atomic_cutoff = true;
+        param.qmmm.cutoff = fabs(cutoff);
+        param.qmmm.write = write;
+        if (param.qmmm.qmmm != simulation::qmmm_mechanical && param.qmmm.software == simulation::qm_nn)
+            io::messages.add("QMMM block: Schnetpack NN works only with mechanical embedding scheme",
+                "io::In_Parameter",
+                io::message::error);
+        if (param.qmmm.qmmm == simulation::qmmm_mechanical && param.qmmm.cutoff != 0.0)
+            io::messages.add("QMMM block: RCUTQM > 0.0 has no effect for mechanical embedding scheme",
+                "In_Parameter",
+                io::message::warning);
 
-    block.get_final_messages();
-    }     // if block
+        block.get_final_messages();
+        }     // if block
 } // QMMM
 
 // two helper data types to simply unsupported block handling
@@ -5634,47 +5634,48 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
 
     std::string blockname = "DFUNCT";
     Block block (blockname, exampleblock.str());
-    if (block.read_buffer(m_block[blockname], false) == 0) 
+    if (block.read_buffer(m_block[blockname], false) == 0) {
         block_read.insert(blockname);
 
-    int dfunct, atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0;
-    double d = 0.0, r_0 = 0.0, force = 0.0;
+        int dfunct, atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0;
+        double d = 0.0, r_0 = 0.0, force = 0.0;
 
-    block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
-    block.get_next_parameter("DATOMI", atom_i, ">0", "");
-    block.get_next_parameter("DATOMJ", atom_j, ">0", "");
-    block.get_next_parameter("DATOMK", atom_k, ">0", "");
-    block.get_next_parameter("DATOML", atom_l, ">0", "");
-    block.get_next_parameter("DFTARG", r_0, "", "");
-    block.get_next_parameter("DFUNCD", d, ">0.0 || <0.0", "");
-    block.get_next_parameter("DFFORC", force, ">0", "");
+        block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
+        block.get_next_parameter("DATOMI", atom_i, ">0", "");
+        block.get_next_parameter("DATOMJ", atom_j, ">0", "");
+        block.get_next_parameter("DATOMK", atom_k, ">0", "");
+        block.get_next_parameter("DATOML", atom_l, ">0", "");
+        block.get_next_parameter("DFTARG", r_0, "", "");
+        block.get_next_parameter("DFUNCD", d, ">0.0 || <0.0", "");
+        block.get_next_parameter("DFFORC", force, ">0", "");
 
-    if (block.error()) {
-      block.get_final_messages();
-      return;
-    }
+        if (block.error()) {
+          block.get_final_messages();
+          return;
+        }
 
-    switch (dfunct) {
-      case 0:
-          param.dfunct.dfunct = simulation::dfunct_off;
-          break;
-      case 1:
-          param.dfunct.dfunct = simulation::dfunct_substitution;
-          break;
-      case 2:
-          param.dfunct.dfunct = simulation::dfunct_diels_alder;
-          break;
-      default:
-          break;
-    }
+        switch (dfunct) {
+          case 0:
+              param.dfunct.dfunct = simulation::dfunct_off;
+              break;
+          case 1:
+              param.dfunct.dfunct = simulation::dfunct_substitution;
+              break;
+          case 2:
+              param.dfunct.dfunct = simulation::dfunct_diels_alder;
+              break;
+          default:
+              break;
+        }
 
-    param.dfunct.atom_i = (atom_i - 1);
-    param.dfunct.atom_j = (atom_j - 1);
-    param.dfunct.atom_k = (atom_k - 1);
-    param.dfunct.atom_l = (atom_l - 1);
-    param.dfunct.r_0 = r_0;
-    param.dfunct.d = d;
-    param.dfunct.force = force;
+        param.dfunct.atom_i = (atom_i - 1);
+        param.dfunct.atom_j = (atom_j - 1);
+        param.dfunct.atom_k = (atom_k - 1);
+        param.dfunct.atom_l = (atom_l - 1);
+        param.dfunct.r_0 = r_0;
+        param.dfunct.d = d;
+        param.dfunct.force = force;
 
-    block.get_final_messages();
+        block.get_final_messages();
+    } // if block
 } // DFUNCT
