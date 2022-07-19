@@ -4195,7 +4195,7 @@ namespace simulation
 
     struct dfunct_struct {
 
-      dfunct_struct() : dfunct(dfunct_off), atom_i(0), atom_j(0), atom_k(0), atom_l(0), target(0.0), d(0), force(0.0) {}
+      dfunct_struct() : dfunct(dfunct_off), atom_i(0), atom_j(0), atom_k(0), atom_l(0), r_0(0.0), d(0), force(0.0) {}
 
       /**
        * dfunct enum 
@@ -4218,9 +4218,9 @@ namespace simulation
        */
       atom_l;
       /**
-       * target distance
+       * r_0 distance
        */
-      double target;
+      double r_0;
       /**
        * addition or subtraction of distances r_ij and r_kl (can be scaled)
        */

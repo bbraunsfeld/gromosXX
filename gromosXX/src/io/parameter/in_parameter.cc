@@ -5608,7 +5608,7 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
     exampleblock << "# DATOMJ 1..N Index of second atom to restrain\n";
     exampleblock << "# DATOMK 1..N Index of third atom to restrain\n";
     exampleblock << "# DATOML 1..N Index of fourth atom to restrain\n";
-    exampleblock << "# DTARG >= 0 Combined target distance\n";
+    exampleblock << "# DTARG >= 0 Combined r_0 distance\n";
     exampleblock << "# DFUNCD: Add or subtract atomic distances\n";
     exampleblock << "#     1: add R_kl to R_ij\n";
     exampleblock << "#    -1: subtract R_kl from R_ij\n";
@@ -5624,14 +5624,14 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
         block_read.insert(blockname);
 
     int dfunct, atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0;
-    double d = 0.0, target = 0.0, force = 0.0;
+    double d = 0.0, r_0 = 0.0, force = 0.0;
 
     block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
     block.get_next_parameter("DATOMI", atom_i, ">0", "");
     block.get_next_parameter("DATOMJ", atom_j, ">0", "");
     block.get_next_parameter("DATOMK", atom_k, ">0", "");
     block.get_next_parameter("DATOML", atom_l, ">0", "");
-    block.get_next_parameter("DFTARG", target, "", "");
+    block.get_next_parameter("DFTARG", r_0, "", "");
     block.get_next_parameter("DFUNCD", d, ">0.0 || <0.0", "");
     block.get_next_parameter("DFFORC", force, ">0", "");
 
@@ -5658,7 +5658,7 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
     param.dfunct.atom_j = (atom_j - 1);
     param.dfunct.atom_k = (atom_k - 1);
     param.dfunct.atom_l = (atom_l - 1);
-    param.dfunct.target = target;
+    param.dfunct.r_0 = r_0;
     param.dfunct.d = d;
     param.dfunct.force = force;
 

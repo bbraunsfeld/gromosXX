@@ -39,13 +39,13 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
 																					     configuration::Configuration& conf, 
 																					     simulation::Simulation& sim) {
 	// shorten the code 
-	int    atom_i   = sim.param().dfunct.atom_i; 
-	int    atom_j   = sim.param().dfunct.atom_j;
-	int    atom_k   = sim.param().dfunct.atom_k;
-	int    atom_l   = sim.param().dfunct.atom_l;
-	double target   = sim.param().dfunct.target;
-	int    d        = sim.param().dfunct.d;
-	double force    = sim.param().dfunct.force;
+	int atom_i = sim.param().dfunct.atom_i; 
+	int atom_j = sim.param().dfunct.atom_j;
+	int atom_k = sim.param().dfunct.atom_k;
+	int atom_l = sim.param().dfunct.atom_l;
+	double r_0 = sim.param().dfunct.r_0;
+	int d = sim.param().dfunct.d;
+	double force = sim.param().dfunct.force;
 	DEBUG(10, "DFUNCT atom_i " << atom_i << math::v2s(conf.current().pos(atom_i)));
 	DEBUG(10, "DFUNCT atom_j " << atom_j << math::v2s(conf.current().pos(atom_j)));
 	DEBUG(10, "DFUNCT atom_k " << atom_k << math::v2s(conf.current().pos(atom_k)));
@@ -66,12 +66,12 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
 	// compute forces on atoms i, j, k, l and the combined biasing potential
 	math::Vec prefactor_i =     force * (dist_vec_ji / dist_ji);
 	math::Vec prefactor_k = d * force * (dist_vec_lk / dist_lk);
-	double force_term = (dist_ji + d * dist_lk - target);
+	double force_term = (dist_ji + d * dist_lk - r_0);
 	math::Vec force_i =  prefactor_i  * force_term;
 	math::Vec force_j = -force_i;
 	math::Vec force_k =  prefactor_k * force_term;
 	math::Vec force_l = -force_k;
-	double V_bias = 0.5 * force * (dist_ji + d * dist_lk - target) * (dist_ji + d * dist_lk - target);
+	double V_bias = 0.5 * force * (dist_ji + d * dist_lk - r_0) * (dist_ji + d * dist_lk - r_0);
 	DEBUG(10, "DFUNCT Prefactor i " << math::v2s(prefactor_i));
 	DEBUG(10, "DFUNCT Prefactor k " << math::v2s(prefactor_k));
 	DEBUG(10, "DFUNCT Force on i " << math::v2s(force_i));
@@ -92,12 +92,16 @@ template<math::boundary_enum B>
 static int _calculate_dfunct_diels_alder_form(topology::Topology& topo, 
 																					     configuration::Configuration& conf, 
 																					     simulation::Simulation& sim) {
+	/**
+	 * @brief to be implemented
+	 * 
+	 */
 	// shorten the code 
 	int    atom_i   = sim.param().dfunct.atom_i; 
 	int    atom_j   = sim.param().dfunct.atom_j;
 	int    atom_k   = sim.param().dfunct.atom_k;
 	int    atom_l   = sim.param().dfunct.atom_l;
-	double target   = sim.param().dfunct.target;
+	double r_0   = sim.param().dfunct.r_0;
 	int    d        = sim.param().dfunct.d;
 	double force    = sim.param().dfunct.force;
 	DEBUG(10, "DFUNCT atom_i " << atom_i);
@@ -128,12 +132,12 @@ static int _calculate_dfunct_diels_alder_form(topology::Topology& topo,
 	// force with respect to r_ij: k * (unit_vec) * (r_ij + d * r_kl - r_0)
 	// force with respect to r_kl: d * k * (unit_vec) * (r_ij + d * r_kl - r_0) 
 	// https://pubs.acs.org/doi/pdf/10.1021/acs.jctc.0c01112 
-	// math::Vec force_i = force * (dist_vec_ijkl / dist_ijkl) * (dist_ij + d * dist_kl - target);
+	// math::Vec force_i = force * (dist_vec_ijkl / dist_ijkl) * (dist_ij + d * dist_kl - r_0);
 	// math::Vec force_j = force_i;
-	// math::Vec force_k = d * force * (dist_vec_ijkl / dist_ijkl) * (dist_ij + d * dist_kl - target);
+	// math::Vec force_k = d * force * (dist_vec_ijkl / dist_ijkl) * (dist_ij + d * dist_kl - r_0);
 	// math::Vec force_l = force_k;
-	double V_bias = 0.5 * force * (dist_ij + d * dist_kl - target) * (dist_ij + d * dist_kl - target);
-	math::Vec force_i = force * dist_vec_ijkl / dist_ijkl * (dist_ij + d * dist_kl - target);
+	double V_bias = 0.5 * force * (dist_ij + d * dist_kl - r_0) * (dist_ij + d * dist_kl - r_0);
+	math::Vec force_i = force * dist_vec_ijkl / dist_ijkl * (dist_ij + d * dist_kl - r_0);
 	math::Vec force_j = force_i;
 	math::Vec force_k = d * force_i;
 	math::Vec force_l = force_k;
