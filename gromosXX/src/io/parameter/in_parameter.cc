@@ -108,6 +108,7 @@ void io::In_Parameter::read(simulation::Parameter &param,
   read_QMMM(param);
   read_SYMRES(param);
   read_AMBER(param);
+  read_DFUNCT(param);
 
   read_known_unsupported_blocks();
 
@@ -5599,3 +5600,81 @@ void io::In_Parameter::read_AMBER(simulation::Parameter & param,
   } // if block
 
 } // AMBER
+
+/**
+ * @section dfunct DFUNCT block
+ * @snippet snippets/snippets.cc DFUNCT
+
+ */
+void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream & os ) {
+    DEBUG(8, "read DFUNCT");
+
+    std::stringstream exampleblock;
+    // lines starting with 'exampleblock<<"' and ending with '\n";' (spaces don't matter)
+    // will be used to generate snippets that can be included in the doxygen doc;
+    // the first line is the tag
+    exampleblock << "DFUNCT\n";
+    exampleblock << "# DFUNCT 0..2 apply DFUNCT\n";
+    exampleblock << "#    0: do not apply DFUNCT\n";
+    exampleblock << "#    1: apply DFUNCT to restrain substitution type geometry\n";
+    exampleblock << "#    2: apply DFUNCT to restrain Diels-Alder type geometry\n";
+    exampleblock << "# DATOMI 1..N Index of first atom to restrain\n";
+    exampleblock << "# DATOMJ 1..N Index of second atom to restrain\n";
+    exampleblock << "# DATOMK 1..N Index of third atom to restrain\n";
+    exampleblock << "# DATOML 1..N Index of fourth atom to restrain\n";
+    exampleblock << "# DTARG >= 0 Combined r_0 distance\n";
+    exampleblock << "# DFUNCD: Add or subtract atomic distances\n";
+    exampleblock << "#     1: add R_kl to R_ij\n";
+    exampleblock << "#    -1: subtract R_kl from R_ij\n";
+    exampleblock << "# DFFORC >= 0 Force constant to restrain distance\n";
+    exampleblock << "#\n";
+    exampleblock << "# DFUNCT  DATOMI  DATOMJ  DATOMK  DATOML  DFTARG  DFUNCD  DFFORC\n";
+    exampleblock << "       1       1       2       3       4     0.0      -1   20000\n";
+    exampleblock << "END\n";
+
+    std::string blockname = "DFUNCT";
+    Block block (blockname, exampleblock.str());
+    if (block.read_buffer(m_block[blockname], false) == 0) 
+        block_read.insert(blockname);
+
+    int dfunct, atom_i = 0, atom_j = 0, atom_k = 0, atom_l = 0;
+    double d = 0.0, r_0 = 0.0, force = 0.0;
+
+    block.get_next_parameter("DFUNCT", dfunct, "", "0,1,2");
+    block.get_next_parameter("DATOMI", atom_i, ">0", "");
+    block.get_next_parameter("DATOMJ", atom_j, ">0", "");
+    block.get_next_parameter("DATOMK", atom_k, ">0", "");
+    block.get_next_parameter("DATOML", atom_l, ">0", "");
+    block.get_next_parameter("DFTARG", r_0, "", "");
+    block.get_next_parameter("DFUNCD", d, ">0.0 || <0.0", "");
+    block.get_next_parameter("DFFORC", force, ">0", "");
+
+    if (block.error()) {
+      block.get_final_messages();
+      return;
+    }
+
+    switch (dfunct) {
+      case 0:
+          param.dfunct.dfunct = simulation::dfunct_off;
+          break;
+      case 1:
+          param.dfunct.dfunct = simulation::dfunct_substitution;
+          break;
+      case 2:
+          param.dfunct.dfunct = simulation::dfunct_diels_alder;
+          break;
+      default:
+          break;
+    }
+
+    param.dfunct.atom_i = (atom_i - 1);
+    param.dfunct.atom_j = (atom_j - 1);
+    param.dfunct.atom_k = (atom_k - 1);
+    param.dfunct.atom_l = (atom_l - 1);
+    param.dfunct.r_0 = r_0;
+    param.dfunct.d = d;
+    param.dfunct.force = force;
+
+    block.get_final_messages();
+} // DFUNCT
