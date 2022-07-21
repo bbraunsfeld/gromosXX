@@ -8,6 +8,11 @@
 
 namespace interaction {
 
+  /*
+   * The DFUNCT interaction was described in used
+   * in this publication to model transition states:
+   * https://pubs.acs.org/doi/pdf/10.1021/acs.jctc.0c01112
+  */
   class DFunct_Interaction : public Interaction {
 
   public:
