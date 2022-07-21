@@ -81,21 +81,18 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
   DEBUG(10, "DFUNCT Force on k " << math::v2s(force_k));
   DEBUG(10, "DFUNCT Force on l " << math::v2s(force_l));
 	DEBUG(10, "DFUNCT V_bias " << V_bias);
-	DEBUG(20, "DFUNCT Overall force before on i " << math::v2s(conf.current().force(atom_i)));
-  DEBUG(20, "DFUNCT Overall force before on j " << math::v2s(conf.current().force(atom_j)));
-  DEBUG(20, "DFUNCT Overall force before on k " << math::v2s(conf.current().force(atom_k)));
-  DEBUG(20, "DFUNCT Overall force before on l " << math::v2s(conf.current().force(atom_l)));
 	
-	// store forces and biasing potential
+	// store forces
 	conf.current().force(atom_i) += force_i;
 	conf.current().force(atom_j) += force_j;
 	conf.current().force(atom_k) += force_k;
 	conf.current().force(atom_l) += force_l;
-	DEBUG(20, "DFUNCT Overall force after on i " << math::v2s(conf.current().force(atom_i)));
-  DEBUG(20, "DFUNCT Overall force after on j " << math::v2s(conf.current().force(atom_j)));
-  DEBUG(20, "DFUNCT Overall force after on k " << math::v2s(conf.current().force(atom_k)));
-  DEBUG(20, "DFUNCT Overall force after on l " << math::v2s(conf.current().force(atom_l)));
-	conf.current().energies.distanceres_total += V_bias;
+
+	// distribute potential over all participating atoms
+	conf.current().energies.distanceres_energy[topo.atom_energy_group()[atom_i]] += 0.25 * V_bias;
+	conf.current().energies.distanceres_energy[topo.atom_energy_group()[atom_j]] += 0.25 * V_bias;
+	conf.current().energies.distanceres_energy[topo.atom_energy_group()[atom_k]] += 0.25 * V_bias;
+	conf.current().energies.distanceres_energy[topo.atom_energy_group()[atom_l]] += 0.25 * V_bias;
 	return 0;
 }
 
