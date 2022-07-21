@@ -50,10 +50,11 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
 	DEBUG(10, "DFUNCT atom_j " << atom_j << math::v2s(conf.current().pos(atom_j)));
 	DEBUG(10, "DFUNCT atom_k " << atom_k << math::v2s(conf.current().pos(atom_k)));
 	DEBUG(10, "DFUNCT atom_l " << atom_l << math::v2s(conf.current().pos(atom_l)));
+
 	// atomic distances expressed as vectors
 	// in GROMOS vector r_ji is defined as the vector from point i to point j (r_j - r_i)
-	math::Vec dist_vec_ji, dist_vec_lk;
 	// find nearest periodic copies
+	math::Vec dist_vec_ji, dist_vec_lk;
 	math::Periodicity<B> periodicity(conf.current().box);
 	periodicity.nearest_image(conf.current().pos(atom_j), conf.current().pos(atom_i), dist_vec_ji);
 	periodicity.nearest_image(conf.current().pos(atom_l), conf.current().pos(atom_k), dist_vec_lk);
@@ -63,6 +64,7 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
 	DEBUG(30, "DFUNCT dist_vec_lk " << math::v2s(dist_vec_lk));
 	DEBUG(30, "DFUNCT dist_ji " << dist_ji);
 	DEBUG(30, "DFUNCT dist_lk " << dist_lk);
+
 	// compute forces on atoms i, j, k, l and the combined biasing potential
 	math::Vec prefactor_i =     force * (dist_vec_ji / dist_ji);
 	math::Vec prefactor_k = d * force * (dist_vec_lk / dist_lk);
@@ -83,6 +85,7 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
   DEBUG(20, "DFUNCT Overall force before on j " << math::v2s(conf.current().force(atom_j)));
   DEBUG(20, "DFUNCT Overall force before on k " << math::v2s(conf.current().force(atom_k)));
   DEBUG(20, "DFUNCT Overall force before on l " << math::v2s(conf.current().force(atom_l)));
+	
 	// store forces and biasing potential
 	conf.current().force(atom_i) += force_i;
 	conf.current().force(atom_j) += force_j;
