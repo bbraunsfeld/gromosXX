@@ -120,8 +120,8 @@ static int _calculate_dfunct_diels_alder_form(topology::Topology& topo,
 	// find nearest periodic copies
 	math::Vec dist_vec_ji, dist_vec_lk, dist_vec_lkji;
 	math::Periodicity<B> periodicity(conf.current().box);
-	periodicity.nearest_image(conf.current().pos(atom_j), conf.current().pos(atom_i), dist_vec_ji);
-	periodicity.nearest_image(conf.current().pos(atom_l), conf.current().pos(atom_k), dist_vec_lk);
+	periodicity.nearest_image(conf.current().pos(atom_j), -1.0 * conf.current().pos(atom_i), dist_vec_ji);
+	periodicity.nearest_image(conf.current().pos(atom_l), -1.0 * conf.current().pos(atom_k), dist_vec_lk);
 	double dist_ji   = math::abs(dist_vec_ji);
 	double dist_lk   = math::abs(dist_vec_lk);
 	DEBUG(30, "DFUNCT dist_vec_ji " << math::v2s(dist_vec_ji));
@@ -136,7 +136,7 @@ static int _calculate_dfunct_diels_alder_form(topology::Topology& topo,
 	DEBUG(30, "DFUNCT dist_ljki " << dist_ljki);
 	
 	// compute forces
-	math::Vec force_i = -1.0 * force * (dist_vec_lkji / dist_ljki) * (dist_ljki - r_0);
+	math::Vec force_i = force * (dist_vec_lkji / dist_ljki) * (dist_ljki - r_0);
 	math::Vec force_j = force_i;
 	math::Vec force_k = -1.0 * force_i;
 	math::Vec force_l = force_k;
