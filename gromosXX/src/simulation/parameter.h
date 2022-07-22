@@ -118,9 +118,9 @@ namespace simulation
      */
     dfunct_substitution,
     /**
-     * restrain Diels-Alder type geometry
+     * restrain cycloaddition type geometry
      */
-    dfunct_diels_alder
+    dfunct_cycloaddition
   };
   /**
    * @enum special_loop_enum
