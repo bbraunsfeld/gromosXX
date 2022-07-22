@@ -14,14 +14,6 @@
 
 #include "../../math/periodicity.h"
 #include "../../math/gmath.h"
-//copied input output begin
-#include <io/instream.h>
-#include <io/blockinput.h>
-#include <io/parameter/in_parameter.h>
-#include <iostream>
-#include <fstream>
-//copied input output end
-// special interactions
 #include "../../interaction/interaction_types.h"
 
 #include "../../interaction/special/dfunct_interaction.h"
@@ -51,10 +43,6 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
 	DEBUG(10, "DFUNCT atom_j " << atom_j << math::v2s(conf.current().pos(atom_j)));
 	DEBUG(10, "DFUNCT atom_k " << atom_k << math::v2s(conf.current().pos(atom_k)));
 	DEBUG(10, "DFUNCT atom_l " << atom_l << math::v2s(conf.current().pos(atom_l)));
-
-	// atomic distances expressed as vectors
-	// in GROMOS vector r_ji is defined as the vector from point i to point j (r_j - r_i)
-	// find nearest periodic copies
 	math::Vec dist_vec_ji, dist_vec_lk;
 	math::Periodicity<B> periodicity(conf.current().box);
 	periodicity.nearest_image(conf.current().pos(atom_j), conf.current().pos(atom_i), dist_vec_ji);
@@ -98,7 +86,7 @@ static int _calculate_dfunct_substitution_form(topology::Topology& topo,
 }
 
 template<math::boundary_enum B>
-static int _calculate_dfunct_diels_alder_form(topology::Topology& topo, 
+static int _calculate_dfunct_cycloaddition_form(topology::Topology& topo, 
 																					     configuration::Configuration& conf, 
 																					     simulation::Simulation& sim) {
 	// shorten the code 
@@ -109,21 +97,22 @@ static int _calculate_dfunct_diels_alder_form(topology::Topology& topo,
 	double r_0 = sim.param().dfunct.r_0;
 	int d = sim.param().dfunct.d;
 	double force = sim.param().dfunct.force;
-	DEBUG(10, "DFUNCT Calculating Diels-Alder type potential")
+	DEBUG(10, "DFUNCT Calculating cycloaddition-type potential")
 	DEBUG(10, "DFUNCT atom_i " << atom_i << math::v2s(conf.current().pos(atom_i)));
 	DEBUG(10, "DFUNCT atom_j " << atom_j << math::v2s(conf.current().pos(atom_j)));
 	DEBUG(10, "DFUNCT atom_k " << atom_k << math::v2s(conf.current().pos(atom_k)));
 	DEBUG(10, "DFUNCT atom_l " << atom_l << math::v2s(conf.current().pos(atom_l)));
-
-	// atomic distances expressed as vectors
-	// in GROMOS vector r_ji is defined as the vector from point i to point j (r_j - r_i)
-	// find nearest periodic copies
 	math::Vec dist_vec_ji, dist_vec_lk, dist_vec_lkji;
 	math::Periodicity<B> periodicity(conf.current().box);
+	// algorithm:
+	// (1) find mean from i to j and k to l, respectively
+	// (2) add r_i and r_k, respectively
+	// (3) find mean between these new vectors
+	// note: this procedure can be simplified as demonstrated below
 	periodicity.nearest_image(conf.current().pos(atom_j), -1.0 * conf.current().pos(atom_i), dist_vec_ji);
 	periodicity.nearest_image(conf.current().pos(atom_l), -1.0 * conf.current().pos(atom_k), dist_vec_lk);
-	double dist_ji   = math::abs(dist_vec_ji);
-	double dist_lk   = math::abs(dist_vec_lk);
+	double dist_ji = math::abs(dist_vec_ji);
+	double dist_lk = math::abs(dist_vec_lk);
 	DEBUG(30, "DFUNCT dist_vec_ji " << math::v2s(dist_vec_ji));
 	DEBUG(30, "DFUNCT dist_vec_lk " << math::v2s(dist_vec_lk));
 	DEBUG(30, "DFUNCT dist_ji " << dist_ji);
@@ -176,17 +165,22 @@ int interaction::DFunct_Interaction::init(topology::Topology& topo,
 int interaction::DFunct_Interaction::calculate_interactions(topology::Topology & topo,
 				                                                    configuration::Configuration& conf,
 				                                                    simulation::Simulation& sim) {
-  switch (sim.param().dfunct.dfunct) {
+  // atomic distances expressed as vectors
+	// in GROMOS vector r_ji is defined as the vector from point i to point j (r_j - r_i)
+	// find nearest periodic copies
+	switch (sim.param().dfunct.dfunct) {
 		case simulation::dfunct_substitution:
+		  // restrain the distances of an incoming (i) and outgoing (l) atom to a central atom (j,k), respectively
 			SPLIT_BOUNDARY(_calculate_dfunct_substitution_form, topo, conf, sim);
 			break;
 
-		case simulation::dfunct_diels_alder:
-			SPLIT_BOUNDARY(_calculate_dfunct_diels_alder_form, topo, conf, sim);
+		case simulation::dfunct_cycloaddition:
+		  // restrain the distance between two cycloaddition reaction partners (i, j) and (k, l), respectively
+			SPLIT_BOUNDARY(_calculate_dfunct_cycloaddition_form, topo, conf, sim);
 			break;
 
 		default:
-      io::messages.add("DFunct functional not implemented", "DFunct_Interaction", io::message::critical);
+      io::messages.add("DFUNCT functional not implemented", "DFunct_Interaction", io::message::critical);
       break;
 		}
 	

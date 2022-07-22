@@ -5601,14 +5601,14 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
     exampleblock << "DFUNCT\n";
     exampleblock << "# DFUNCT 0..2 apply DFUNCT\n";
     exampleblock << "#    0: do not apply DFUNCT\n";
-    exampleblock << "#    1: apply DFUNCT to restrain substitution type geometry\n";
-    exampleblock << "#    2: apply DFUNCT to restrain Diels-Alder type geometry\n";
+    exampleblock << "#    1: apply DFUNCT to restrain substitution-type geometry\n";
+    exampleblock << "#    2: apply DFUNCT to restrain cycloaddition-type geometry\n";
     exampleblock << "# DATOMI 1..N Index of first atom to restrain\n";
     exampleblock << "# DATOMJ 1..N Index of second atom to restrain\n";
     exampleblock << "# DATOMK 1..N Index of third atom to restrain\n";
     exampleblock << "# DATOML 1..N Index of fourth atom to restrain\n";
-    exampleblock << "# DTARG >= 0 Combined r_0 distance\n";
-    exampleblock << "# DFUNCD: Add or subtract atomic distances\n";
+    exampleblock << "# DTARG >= 0 Combined distance r_0 to target\n";
+    exampleblock << "# DFUNCD: Add or subtract atomic distances (ignored for cycloaddition-type potentials)\n";
     exampleblock << "#     1: add R_kl to R_ij\n";
     exampleblock << "#    -1: subtract R_kl from R_ij\n";
     exampleblock << "# DFFORC >= 0 Force constant to restrain distance\n";
@@ -5647,7 +5647,7 @@ void io::In_Parameter::read_DFUNCT(simulation::Parameter & param, std::ostream &
               param.dfunct.dfunct = simulation::dfunct_substitution;
               break;
           case 2:
-              param.dfunct.dfunct = simulation::dfunct_diels_alder;
+              param.dfunct.dfunct = simulation::dfunct_cycloaddition;
               break;
           default:
               break;
