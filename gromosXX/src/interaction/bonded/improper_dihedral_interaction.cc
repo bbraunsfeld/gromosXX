@@ -30,8 +30,8 @@
  */
 template<math::boundary_enum B, math::virial_enum V>
 static int _calculate_improper_interactions(topology::Topology & topo,
-					    configuration::Configuration & conf,
-					    simulation::Simulation & sim)
+                        configuration::Configuration & conf,
+                        simulation::Simulation & sim)
 {
   std::vector<interaction::improper_dihedral_type_struct> const & param = topo.impdihedral_types();
   // loop over the improper dihedrals
@@ -104,16 +104,16 @@ static int _calculate_improper_interactions(topology::Topology & topo,
     const double q0 = param[i_it->type].q0;
 
     double ki = -K * (q - q0) * dkj;
-	double kl = -ki;
-	if ( dmj2 < ( (1.0e-10 * dkj2))){
+    double kl = -ki;
+    if ( dmj2 < ( (1.0e-10 * dkj2))){
        ki = 0;
-	   io::messages.add("One bond angle is close to 180 degrees!","improper_dihedral_interaction",io::message::warning);
+       io::messages.add("One bond angle is close to 180 degrees!","improper_dihedral_interaction",io::message::warning);
     } else {
        ki = ki / dmj2;
     }
     if ( dnk2 < ( (1.0e-10 * dkj2))){
        kl = 0;
-	   io::messages.add("One bond angle is close to 180 degrees!","improper_dihedral_interaction",io::message::warning);
+       io::messages.add("One bond angle is close to 180 degrees!","improper_dihedral_interaction",io::message::warning);
     } else {
        kl = kl / dnk2;
     }
@@ -135,11 +135,11 @@ static int _calculate_improper_interactions(topology::Topology & topo,
       periodicity.nearest_image(pos(i_it->l), pos(i_it->j), rlj);
 
       for(int a=0; a<3; ++a)
-	for(int bb=0; bb<3; ++bb)
-	  conf.current().virial_tensor(a, bb) += 
-	    rij(a) * fi(bb) +
-	    rkj(a) * fk(bb) +
-	    rlj(a) * fl(bb);
+    for(int bb=0; bb<3; ++bb)
+      conf.current().virial_tensor(a, bb) +=
+        rij(a) * fi(bb) +
+        rkj(a) * fk(bb) +
+        rlj(a) * fl(bb);
 
       DEBUG(11, "\tatomic virial done");
       // }
@@ -156,13 +156,13 @@ static int _calculate_improper_interactions(topology::Topology & topo,
 
 int interaction::Improper_Dihedral_Interaction
 ::calculate_interactions(topology::Topology &topo,
-			 configuration::Configuration &conf,
-			 simulation::Simulation &sim)
+             configuration::Configuration &conf,
+             simulation::Simulation &sim)
 {
   m_timer.start();
   
   SPLIT_VIRIAL_BOUNDARY(_calculate_improper_interactions,
-			topo, conf, sim);
+            topo, conf, sim);
 
   m_timer.stop();
 
