@@ -103,7 +103,7 @@ static int _calculate_improper_interactions(topology::Topology & topo,
     const double K  = param[i_it->type].K;
     const double q0 = param[i_it->type].q0;
 
-    double q_diff = q - q0
+    double q_diff = q - q0;
 
     double ki = -K * (q_diff) * dkj;
     double kl = -ki;
