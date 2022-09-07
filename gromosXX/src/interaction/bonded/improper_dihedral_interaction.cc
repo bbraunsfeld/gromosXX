@@ -103,7 +103,9 @@ static int _calculate_improper_interactions(topology::Topology & topo,
     const double K  = param[i_it->type].K;
     const double q0 = param[i_it->type].q0;
 
-    double ki = -K * (q - q0) * dkj;
+    double q_diff = q - q0
+
+    double ki = -K * (q_diff) * dkj;
     double kl = -ki;
     if ( dmj2 < ( (1.0e-10 * dkj2))){
        ki = 0;
@@ -145,7 +147,7 @@ static int _calculate_improper_interactions(topology::Topology & topo,
       // }
 
 
-    energy = 0.5 * K * (q-q0) * (q-q0);
+    energy = 0.5 * K * q_diff * q_diff;
     conf.current().energies.improper_energy[topo.atom_energy_group()[i_it->i]]
       += energy;
     
