@@ -73,6 +73,7 @@
     when: always
     paths:
       - gromosXX
+      - build/src/check/test-suite.log
       - build/lib
       - $BUILD_DIR
 
