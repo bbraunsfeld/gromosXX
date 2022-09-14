@@ -67,6 +67,7 @@
     - echo $CUDA_OPTIONS
     - cd build/ 
     - make -j4 $ENV_COMPILER
+    - make check $ENV_COMPILER
     - make install $ENV_COMPILER
   artifacts:
     when: always
