@@ -1,6 +1,7 @@
 stages:
   - configure-build
   - build
+  - make_check
 
 include:
   - local: 'gromosXX/admin/gitlab-ci/gromos.gitlab-ci.yml'

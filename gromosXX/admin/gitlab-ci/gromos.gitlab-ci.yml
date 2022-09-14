@@ -71,6 +71,19 @@
   artifacts:
     when: always
     paths:
+      - gromosXX
+      - build/lib
+      - $BUILD_DIR
+
+.gromos:base:make_check:
+  stage: make_check
+  script: 
+    - cd build/ 
+    - make check $ENV_COMPILER
+  artifacts:
+    when: always
+    paths:
+      - build/src/check/test-suite.log
       - $BUILD_DIR
 
 include:
@@ -80,7 +93,7 @@ include:
 #  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-20.04.yml'
 #  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-20.04-llvm.yml'
   - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-20.04-mpi.yml'
-  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-20.04-cuda-11.6.1.yml'
+    #  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-20.04-cuda-11.6.1.yml'
 #  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-18.04.yml'
 #  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-18.04-llvm.yml'
 #  - local: 'gromosXX/admin/gitlab-ci/gromos.matrix/ubuntu-18.04-mpi.yml'
